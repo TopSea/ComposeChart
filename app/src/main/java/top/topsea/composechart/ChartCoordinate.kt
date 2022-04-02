@@ -11,7 +11,12 @@ fun drawChartCoordinate(
     width: Float,
     withGrid: Boolean = true,
     withArrow: Boolean = true,
+    withText: Boolean = true,
+    xUnit: String = "元",
+    yUnit: String = "斤",
 ) {
+    val xLines = floor(height / 100).toInt()
+    val yLines = floor(width / 100).toInt()
     val xAxis = Path()
     //减去20是为了创造出交叉效果
     xAxis.moveTo((ChartConfig.horPadding - 20), height - ChartConfig.verPadding)
@@ -36,13 +41,11 @@ fun drawChartCoordinate(
 
     //画网格
     if (withGrid) {
-        val xLines = floor(height / 100).toInt()
         xAxisPaint.strokeWidth = 2f
         for (i in 1 until xLines - 1) {
             xAxis.translate(Offset(0f, -100f))
             canvas.drawPath(xAxis, xAxisPaint)
         }
-        val yLines = floor(width / 100).toInt()
         yAxisPaint.strokeWidth = 2f
         for (i in 1 until yLines - 1) {
             yAxis.translate(Offset(100f, 0f))
@@ -66,6 +69,54 @@ fun drawChartCoordinate(
         yArrows.close()
         yAxisPaint.style = PaintingStyle.Fill
         canvas.drawPath(yArrows, yAxisPaint)
+    }
+
+    //画文字
+    if (withText) {
+        val txtSize = 24f
+        val textPaint = NativePaint().apply {
+            color = android.graphics.Color.BLACK
+            style = android.graphics.Paint.Style.FILL
+            strokeWidth = 1f
+            textSize = txtSize
+        }
+        val textCanvas = canvas.nativeCanvas
+        //单位
+        val xUt = if (xUnit.isNotEmpty()) {
+            "x($xUnit)"
+        } else {
+            "x"
+        }
+        val yUt = if (yUnit.isNotEmpty()) {
+            "y($yUnit)"
+        } else {
+            "y"
+        }
+        textCanvas.drawText(xUt,
+            width - ChartConfig.horPadding,
+            height - ChartConfig.verPadding + txtSize * 1.5f,
+            textPaint
+        )
+        textCanvas.drawText(yUt,
+            ChartConfig.horPadding - txtSize * 2f,
+            ChartConfig.verPadding,
+            textPaint
+        )
+
+        for (i in 0 until yLines - 1) {
+            textCanvas.drawText(i.toString(),
+                ChartConfig.horPadding - txtSize / 2 + (i * 100f),
+                height - ChartConfig.verPadding + txtSize,
+                textPaint
+            )
+        }
+        for (j in xLines - 2 downTo 1) {
+            textCanvas.drawText(j.toString(),
+                ChartConfig.horPadding - txtSize * 2,
+                height - ChartConfig.verPadding + txtSize / 2 - (j * 100f),
+                textPaint
+            )
+        }
     }
 }
 
