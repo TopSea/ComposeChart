@@ -137,14 +137,26 @@ fun drawLine(
         )
     }
 
-    if (withDot) {
-        val dotPaint = Paint().apply {
-            style = PaintingStyle.Fill
-            color = Color.Red
-            strokeWidth = 3f
+    val line = Path()
+    listDot.forEach { offset ->
+        if (offset == listDot.first()) {
+            line.moveTo(offset.x, offset.y)
+        } else {
+            line.lineTo(offset.x, offset.y)
         }
-        listDot.forEach { offset ->
+        if (withDot) {
+            val dotPaint = Paint().apply {
+                style = PaintingStyle.Fill
+                color = Color.Red
+                strokeWidth = 3f
+            }
             canvas.drawCircle(offset, 8f, dotPaint)
         }
     }
+    val linePaint = Paint().apply {
+        style = PaintingStyle.Stroke
+        color = Color.Red
+        strokeWidth = 2f
+    }
+    canvas.drawPath(line, linePaint)
 }
