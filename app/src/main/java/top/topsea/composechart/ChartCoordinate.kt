@@ -15,8 +15,8 @@ fun drawChartCoordinate(
     xUnit: String = "元",
     yUnit: String = "斤",
 ) {
-    val xLines = floor(height / 100).toInt()
-    val yLines = floor(width / 100).toInt()
+    val xLines = floor(height / ChartConfig.gridSize).toInt()
+    val yLines = floor(width / ChartConfig.gridSize).toInt()
     val xAxis = Path()
     //减去20是为了创造出交叉效果
     xAxis.moveTo((ChartConfig.horPadding - 20), height - ChartConfig.verPadding)
@@ -43,12 +43,12 @@ fun drawChartCoordinate(
     if (withGrid) {
         xAxisPaint.strokeWidth = 2f
         for (i in 1 until xLines - 1) {
-            xAxis.translate(Offset(0f, -100f))
+            xAxis.translate(Offset(0f, -ChartConfig.gridSize))
             canvas.drawPath(xAxis, xAxisPaint)
         }
         yAxisPaint.strokeWidth = 2f
         for (i in 1 until yLines - 1) {
-            yAxis.translate(Offset(100f, 0f))
+            yAxis.translate(Offset(ChartConfig.gridSize, 0f))
             canvas.drawPath(yAxis, yAxisPaint)
         }
     }
@@ -105,7 +105,7 @@ fun drawChartCoordinate(
 
         for (i in 0 until yLines - 1) {
             textCanvas.drawText(i.toString(),
-                ChartConfig.horPadding - txtSize / 2 + (i * 100f),
+                ChartConfig.horPadding - txtSize / 2 + (i * ChartConfig.gridSize),
                 height - ChartConfig.verPadding + txtSize,
                 textPaint
             )
@@ -113,10 +113,38 @@ fun drawChartCoordinate(
         for (j in xLines - 2 downTo 1) {
             textCanvas.drawText(j.toString(),
                 ChartConfig.horPadding - txtSize * 2,
-                height - ChartConfig.verPadding + txtSize / 2 - (j * 100f),
+                height - ChartConfig.verPadding + txtSize / 2 - (j * ChartConfig.gridSize),
                 textPaint
             )
         }
     }
 }
 
+fun drawLine(
+    canvas: Canvas,
+    values: List<Float>,
+    height: Float,
+    withDot: Boolean = true
+) {
+    val listDot = mutableListOf<Offset>()
+    val bottom = height - ChartConfig.verPadding
+    values.forEachIndexed { index, value ->
+        listDot.add(
+            Offset(
+            index * ChartConfig.gridSize + ChartConfig.horPadding,
+            bottom - value * ChartConfig.gridSize
+            )
+        )
+    }
+
+    if (withDot) {
+        val dotPaint = Paint().apply {
+            style = PaintingStyle.Fill
+            color = Color.Red
+            strokeWidth = 3f
+        }
+        listDot.forEach { offset ->
+            canvas.drawCircle(offset, 8f, dotPaint)
+        }
+    }
+}
