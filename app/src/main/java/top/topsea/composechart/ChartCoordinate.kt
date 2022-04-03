@@ -125,6 +125,7 @@ fun drawLine(
     canvas: Canvas,
     values: List<Float>,
     height: Float,
+    width: Float,
     dotClicked: Int,
     withDot: Boolean = true
 ) {
@@ -137,14 +138,6 @@ fun drawLine(
             index * ChartConfig.gridSize + ChartConfig.horPadding,
             bottom - value * ChartConfig.gridSize
             )
-        )
-    }
-
-    if (dotClicked != Int.MAX_VALUE) {
-        drawDotInfo(
-            canvas = canvas,
-            listDot = listDot,
-            witchOne = dotClicked
         )
     }
 
@@ -170,17 +163,39 @@ fun drawLine(
         strokeWidth = 2f
     }
     canvas.drawPath(line, linePaint)
+
+    //保证信息显示在最上层
+    if (dotClicked != Int.MAX_VALUE) {
+        drawDotInfo(
+            canvas = canvas,
+            listDot = listDot,
+            width = width,
+            witchOne = dotClicked
+        )
+    }
 }
 
 fun drawDotInfo(
     canvas: Canvas,
     listDot: List<Offset>,
-    witchOne: Int
+    width: Float,
+    witchOne: Int,
+    info: String = "Let's write info about this dot."
 ) {
-    val infoStart = listDot[witchOne].x - ChartConfig.infoWidth
-    val infoEnd = listDot[witchOne].x + ChartConfig.infoWidth
-    val infoTop = listDot[witchOne].y - ChartConfig.infoHeight
-    val infoBottom = listDot[witchOne].y - 40f
+    var infoStart = listDot[witchOne].x
+    var infoEnd = listDot[witchOne].x + ChartConfig.infoWidth * 2
+    var infoTop = listDot[witchOne].y - ChartConfig.infoHeight
+    var infoBottom = listDot[witchOne].y
+
+    if (infoEnd > width) {
+        infoStart = listDot[witchOne].x - ChartConfig.infoWidth * 2
+        infoEnd = listDot[witchOne].x
+    }
+    if (infoTop < 0) {
+        infoTop = listDot[witchOne].y
+        infoBottom = listDot[witchOne].y + ChartConfig.infoHeight
+    }
+    val center = (infoStart + infoEnd) / 2
 
     val infoRectPaint = Paint().apply {
         style = PaintingStyle.Fill
@@ -199,23 +214,37 @@ fun drawDotInfo(
     canvas.drawRect(infoStart, infoTop, infoEnd, infoBottom, infoRectPaint)
 
     canvas.nativeCanvas.drawText("Title",
-        listDot[witchOne].x - textPaint.textSize,
+        center - textPaint.textSize,
         infoTop + 50f,
         textPaint
     )
     textPaint.textSize = 30f
-    canvas.nativeCanvas.drawText("Some info about",
-        infoStart + 20f,
-        infoTop + 100f,
-        textPaint
-    )
-    canvas.nativeCanvas.drawText("this dot",
-        infoStart + 20f,
-        infoTop + 130f,
-        textPaint
-    )
 
-    canvas.drawCircle(listDot[witchOne], 20f, Paint().apply {
+    //内容过长需要换行
+    val limit = ChartConfig.infoWidth - 40f
+    val limitChars = (limit / 6f).toInt()
+    if (info.length > limitChars) {
+        val subStr1 = info.substring(0, limitChars)
+        canvas.nativeCanvas.drawText(subStr1,
+            infoStart + 20f,
+            infoTop + 100f,
+            textPaint
+        )
+
+        val subStr2 = info.substring(limitChars)
+        canvas.nativeCanvas.drawText(subStr2,
+            infoStart + 20f,
+            infoTop + 140f,
+            textPaint
+        )
+    } else {
+        canvas.nativeCanvas.drawText(info,
+            infoStart + 20f,
+            infoTop + 100f,
+            textPaint
+        )
+    }
+    canvas.drawCircle(listDot[witchOne], 16f, Paint().apply {
         style = PaintingStyle.Fill
         color = Color.Red
         strokeWidth = 3f
