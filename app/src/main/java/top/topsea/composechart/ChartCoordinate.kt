@@ -18,9 +18,10 @@ fun drawChartCoordinate(
     val xLines = floor(height / ChartConfig.gridSize).toInt()
     val yLines = floor(width / ChartConfig.gridSize).toInt()
     val xAxis = Path()
+    val bottom = (xLines - 1) * ChartConfig.gridSize + ChartConfig.verPadding
     //减去20是为了创造出交叉效果
-    xAxis.moveTo((ChartConfig.horPadding - 20), height - ChartConfig.verPadding)
-    xAxis.lineTo(width - ChartConfig.horPadding, height - ChartConfig.verPadding)
+    xAxis.moveTo((ChartConfig.horPadding - 20), bottom)
+    xAxis.lineTo(width - ChartConfig.horPadding, bottom)
     val xAxisPaint = Paint().apply {
         strokeWidth = 5f
         color = Color.LightGray
@@ -31,7 +32,7 @@ fun drawChartCoordinate(
     val yAxis = Path()
     //加上20是为了创造出交叉效果
     yAxis.moveTo(ChartConfig.horPadding, ChartConfig.verPadding)
-    yAxis.lineTo(ChartConfig.horPadding, height - ChartConfig.verPadding + 20)
+    yAxis.lineTo(ChartConfig.horPadding, bottom + 20)
     val yAxisPaint = Paint().apply {
         strokeWidth = 5f
         color = Color.LightGray
@@ -55,9 +56,9 @@ fun drawChartCoordinate(
     //画箭头
     if (withArrow) {
         val xArrows = Path()
-        xArrows.moveTo(width - ChartConfig.horPadding, height - ChartConfig.verPadding - 15)
-        xArrows.lineTo(width - ChartConfig.horPadding, height - ChartConfig.verPadding + 15)
-        xArrows.lineTo(width - ChartConfig.horPadding + 30, height - ChartConfig.verPadding)
+        xArrows.moveTo(width - ChartConfig.horPadding, bottom - 15)
+        xArrows.lineTo(width - ChartConfig.horPadding, bottom + 15)
+        xArrows.lineTo(width - ChartConfig.horPadding + 30, bottom)
         xArrows.close()
         xAxisPaint.style = PaintingStyle.Fill
         canvas.drawPath(xArrows, xAxisPaint)
@@ -94,7 +95,7 @@ fun drawChartCoordinate(
         }
         textCanvas.drawText(xUt,
             width - ChartConfig.horPadding,
-            height - ChartConfig.verPadding + txtSize * 1.5f,
+            bottom + txtSize * 1.5f,
             textPaint
         )
         textCanvas.drawText(yUt,
@@ -106,14 +107,14 @@ fun drawChartCoordinate(
         for (i in 0 until yLines - 1) {
             textCanvas.drawText(i.toString(),
                 ChartConfig.horPadding - txtSize / 2 + (i * ChartConfig.gridSize),
-                height - ChartConfig.verPadding + txtSize,
+                bottom + txtSize,
                 textPaint
             )
         }
         for (j in xLines - 2 downTo 1) {
             textCanvas.drawText(j.toString(),
                 ChartConfig.horPadding - txtSize * 2,
-                height - ChartConfig.verPadding + txtSize / 2 - (j * ChartConfig.gridSize),
+                bottom + txtSize / 2 - (j * ChartConfig.gridSize),
                 textPaint
             )
         }
@@ -124,16 +125,26 @@ fun drawLine(
     canvas: Canvas,
     values: List<Float>,
     height: Float,
+    dotClicked: Int,
     withDot: Boolean = true
 ) {
     val listDot = mutableListOf<Offset>()
-    val bottom = height - ChartConfig.verPadding
+    val xLines = floor(height / ChartConfig.gridSize).toInt()
+    val bottom = (xLines - 1) * ChartConfig.gridSize + ChartConfig.verPadding
     values.forEachIndexed { index, value ->
         listDot.add(
             Offset(
             index * ChartConfig.gridSize + ChartConfig.horPadding,
             bottom - value * ChartConfig.gridSize
             )
+        )
+    }
+
+    if (dotClicked != Int.MAX_VALUE) {
+        drawDotInfo(
+            canvas = canvas,
+            listDot = listDot,
+            witchOne = dotClicked
         )
     }
 
@@ -159,4 +170,54 @@ fun drawLine(
         strokeWidth = 2f
     }
     canvas.drawPath(line, linePaint)
+}
+
+fun drawDotInfo(
+    canvas: Canvas,
+    listDot: List<Offset>,
+    witchOne: Int
+) {
+    val infoStart = listDot[witchOne].x - ChartConfig.infoWidth
+    val infoEnd = listDot[witchOne].x + ChartConfig.infoWidth
+    val infoTop = listDot[witchOne].y - ChartConfig.infoHeight
+    val infoBottom = listDot[witchOne].y - 40f
+
+    val infoRectPaint = Paint().apply {
+        style = PaintingStyle.Fill
+        color = Color.LightGray
+        alpha = 0.5f
+        strokeWidth = 3f
+    }
+
+    val textPaint = NativePaint().apply {
+        color = android.graphics.Color.BLACK
+        style = android.graphics.Paint.Style.FILL
+        strokeWidth = 1f
+        textSize = 40f
+    }
+
+    canvas.drawRect(infoStart, infoTop, infoEnd, infoBottom, infoRectPaint)
+
+    canvas.nativeCanvas.drawText("Title",
+        listDot[witchOne].x - textPaint.textSize,
+        infoTop + 50f,
+        textPaint
+    )
+    textPaint.textSize = 30f
+    canvas.nativeCanvas.drawText("Some info about",
+        infoStart + 20f,
+        infoTop + 100f,
+        textPaint
+    )
+    canvas.nativeCanvas.drawText("this dot",
+        infoStart + 20f,
+        infoTop + 130f,
+        textPaint
+    )
+
+    canvas.drawCircle(listDot[witchOne], 20f, Paint().apply {
+        style = PaintingStyle.Fill
+        color = Color.Red
+        strokeWidth = 3f
+    })
 }
