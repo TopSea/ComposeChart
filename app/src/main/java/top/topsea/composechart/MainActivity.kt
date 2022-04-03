@@ -5,6 +5,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.rememberTransformableState
+import androidx.compose.foundation.gestures.transformable
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -13,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.tooling.preview.Preview
 import top.topsea.composechart.ui.theme.ComposeChartTheme
@@ -40,9 +43,21 @@ fun Greeting(
     values: List<Float> = listOf(0f, 1f, 2f, 3f, 4f, 5f, 6f, 7f, )
 ) {
     var dotClicked by remember { mutableStateOf(Int.MAX_VALUE) }
+
+    var scale by remember { mutableStateOf(1f) }
+
+    val state = rememberTransformableState { zoomChange, _, _ ->
+        scale *= zoomChange
+        ChartConfig.gridSize = ChartConfig.gridSize * zoomChange
+    }
     Canvas(
         modifier = Modifier
             .fillMaxSize()
+            .graphicsLayer(
+                scaleX = scale,
+                scaleY = scale,
+            )
+            .transformable(state = state)
             .pointerInput(Unit) {
                 detectTapGestures(
                     onPress = { /* Called when the gesture starts */ },

@@ -6,7 +6,7 @@ data class ChartConfig(
     companion object {
         const val horPadding = 80f
         const val verPadding = 40f
-        const val gridSize = 100f
+        var gridSize = 100f
         const val infoWidth = 160f
         const val infoHeight = 200f
     }
