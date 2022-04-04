@@ -4,7 +4,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.*
 import kotlin.math.floor
 
-
 fun drawChartCoordinate(
     canvas: Canvas,
     height: Float,
@@ -15,10 +14,10 @@ fun drawChartCoordinate(
     xUnit: String = "元",
     yUnit: String = "斤",
 ) {
-    val xLines = floor(height / ChartConfig.gridSize).toInt()
-    val yLines = floor(width / ChartConfig.gridSize).toInt()
+    val xLines = floor(height / ChartConfig.gridSize.value).toInt()
+    val yLines = floor(width / ChartConfig.gridSize.value).toInt()
     val xAxis = Path()
-    val bottom = (xLines - 1) * ChartConfig.gridSize + ChartConfig.verPadding
+    val bottom = height - ChartConfig.verPadding
     //减去20是为了创造出交叉效果
     xAxis.moveTo((ChartConfig.horPadding - 20), bottom)
     xAxis.lineTo(width - ChartConfig.horPadding, bottom)
@@ -32,7 +31,7 @@ fun drawChartCoordinate(
     val yAxis = Path()
     //加上20是为了创造出交叉效果
     yAxis.moveTo(ChartConfig.horPadding, ChartConfig.verPadding)
-    yAxis.lineTo(ChartConfig.horPadding, bottom + 20)
+    yAxis.lineTo(ChartConfig.horPadding, bottom + 20f)
     val yAxisPaint = Paint().apply {
         strokeWidth = 5f
         color = Color.LightGray
@@ -44,12 +43,12 @@ fun drawChartCoordinate(
     if (withGrid) {
         xAxisPaint.strokeWidth = 2f
         for (i in 1 until xLines - 1) {
-            xAxis.translate(Offset(0f, -ChartConfig.gridSize))
+            xAxis.translate(Offset(0f, -ChartConfig.gridSize.value))
             canvas.drawPath(xAxis, xAxisPaint)
         }
         yAxisPaint.strokeWidth = 2f
         for (i in 1 until yLines - 1) {
-            yAxis.translate(Offset(ChartConfig.gridSize, 0f))
+            yAxis.translate(Offset(ChartConfig.gridSize.value, 0f))
             canvas.drawPath(yAxis, yAxisPaint)
         }
     }
@@ -106,7 +105,7 @@ fun drawChartCoordinate(
 
         for (i in 0 until yLines - 1) {
             textCanvas.drawText(i.toString(),
-                ChartConfig.horPadding - txtSize / 2 + (i * ChartConfig.gridSize),
+                ChartConfig.horPadding - txtSize / 2 + (i * ChartConfig.gridSize.value),
                 bottom + txtSize,
                 textPaint
             )
@@ -114,7 +113,7 @@ fun drawChartCoordinate(
         for (j in xLines - 2 downTo 1) {
             textCanvas.drawText(j.toString(),
                 ChartConfig.horPadding - txtSize * 2,
-                bottom + txtSize / 2 - (j * ChartConfig.gridSize),
+                bottom + txtSize / 2 - (j * ChartConfig.gridSize.value),
                 textPaint
             )
         }
@@ -130,13 +129,12 @@ fun drawLine(
     withDot: Boolean = true
 ) {
     val listDot = mutableListOf<Offset>()
-    val xLines = floor(height / ChartConfig.gridSize).toInt()
-    val bottom = (xLines - 1) * ChartConfig.gridSize + ChartConfig.verPadding
+    val bottom = height - ChartConfig.verPadding
     values.forEachIndexed { index, value ->
         listDot.add(
             Offset(
-            index * ChartConfig.gridSize + ChartConfig.horPadding,
-            bottom - value * ChartConfig.gridSize
+            index * ChartConfig.gridSize.value + ChartConfig.horPadding,
+            bottom - value * ChartConfig.gridSize.value
             )
         )
     }

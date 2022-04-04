@@ -15,6 +15,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.tooling.preview.Preview
@@ -48,15 +50,18 @@ fun Greeting(
 
     val state = rememberTransformableState { zoomChange, _, _ ->
         scale *= zoomChange
-        ChartConfig.gridSize = ChartConfig.gridSize * zoomChange
+        if (ChartConfig.gridSize.value in 30f..200f) {
+            ChartConfig.gridSize.value = ChartConfig.gridSize.value * scale
+        }
+        if (ChartConfig.gridSize.value < 30f) {
+            ChartConfig.gridSize.value = 30f
+        }else if (ChartConfig.gridSize.value > 200f){
+            ChartConfig.gridSize.value = 200f
+        }
     }
     Canvas(
         modifier = Modifier
             .fillMaxSize()
-            .graphicsLayer(
-                scaleX = scale,
-                scaleY = scale,
-            )
             .transformable(state = state)
             .pointerInput(Unit) {
                 detectTapGestures(
@@ -64,17 +69,17 @@ fun Greeting(
                     onDoubleTap = { /* Called on Double Tap */ },
                     onLongPress = { /* Called on Long Press */ },
                     onTap = { offset ->
-                        val xLines = floor(size.height / ChartConfig.gridSize).toInt()
-                        val bottom = (xLines - 1) * ChartConfig.gridSize + ChartConfig.verPadding
+                        val xLines = floor(size.height / ChartConfig.gridSize.value).toInt()
+                        val bottom = (xLines - 1) * ChartConfig.gridSize.value + ChartConfig.verPadding
 
-                        values.forEachIndexed{ index, _ ->
+                        values.forEachIndexed { index, _ ->
                             val dotSizeX = IntRange(
-                                (ChartConfig.horPadding + index * ChartConfig.gridSize - 16f).toInt(),
-                                (ChartConfig.horPadding + index * ChartConfig.gridSize + 16f).toInt()
+                                (ChartConfig.horPadding + index * ChartConfig.gridSize.value - 16f).toInt(),
+                                (ChartConfig.horPadding + index * ChartConfig.gridSize.value + 16f).toInt()
                             )
                             val dotSizeY = IntRange(
-                                (bottom - values[index] * ChartConfig.gridSize - 16f).toInt(),
-                                (bottom - values[index] * ChartConfig.gridSize + 16f).toInt()
+                                (bottom - values[index] * ChartConfig.gridSize.value - 16f).toInt(),
+                                (bottom - values[index] * ChartConfig.gridSize.value + 16f).toInt()
                             )
                             if (offset.x.toInt() in dotSizeX && offset.y.toInt() in dotSizeY) {
                                 dotClicked = index
@@ -85,6 +90,7 @@ fun Greeting(
                 )
             }
     ) {
+        println("gaohai:::$scale")
         drawChartCoordinate(
             canvas = drawContext.canvas,
             height = size.height,
@@ -97,6 +103,11 @@ fun Greeting(
 //            values = listOf(0f, 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f)
             values = values,
             dotClicked = dotClicked
+        )
+        drawLine(
+            color = Color.Blue,
+            start = Offset.Zero,
+            end = Offset(size.width, size.height)
         )
     }
 }
