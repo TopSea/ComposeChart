@@ -9,58 +9,50 @@ fun drawChartCoordinate(
     canvas: Canvas,
     height: Float,
     width: Float,
-    withGrid: Boolean = true,
-    withArrow: Boolean = true,
-    withText: Boolean = true,
+    coordinateConfig: CoordinateConfig,
     xUnit: String = "元",
     yUnit: String = "斤",
 ) {
-    val xLines = floor(height / ChartConfig.gridSize.value).toInt()
-    val yLines = floor(width / ChartConfig.gridSize.value).toInt()
+    val xLines = (height / ChartConfig.gridSize.value).toInt()
+    val yLines = (width / ChartConfig.gridSize.value).toInt()
     val xAxis = Path()
     val bottom = height - ChartConfig.verPadding
     //减去20是为了创造出交叉效果
     xAxis.moveTo((ChartConfig.horPadding - 20), bottom)
     xAxis.lineTo(width - ChartConfig.horPadding, bottom)
-    val xAxisPaint = Paint().apply {
-        strokeWidth = 5f
-        color = Color.LightGray
-        style = PaintingStyle.Stroke
-    }
+    coordinateConfig.axisPaint.strokeWidth = 5f
+    coordinateConfig.axisPaint.style = PaintingStyle.Stroke
+    val xAxisPaint = coordinateConfig.axisPaint
     canvas.drawPath(xAxis, xAxisPaint)
 
     val yAxis = Path()
     //加上20是为了创造出交叉效果
     yAxis.moveTo(ChartConfig.horPadding, ChartConfig.verPadding)
     yAxis.lineTo(ChartConfig.horPadding, bottom + 20f)
-    val yAxisPaint = Paint().apply {
-        strokeWidth = 5f
-        color = Color.LightGray
-        style = PaintingStyle.Stroke
-    }
+    val yAxisPaint = coordinateConfig.axisPaint
     canvas.drawPath(yAxis, yAxisPaint)
 
     //画网格
-    if (withGrid) {
-        xAxisPaint.strokeWidth = 2f
+    if (coordinateConfig.withGrid) {
+        coordinateConfig.axisPaint.strokeWidth = 2f
         for (i in 1 until xLines - 1) {
             xAxis.translate(Offset(0f, -ChartConfig.gridSize.value))
             canvas.drawPath(xAxis, xAxisPaint)
         }
-        yAxisPaint.strokeWidth = 2f
+
         for (i in 1 until yLines - 1) {
             yAxis.translate(Offset(ChartConfig.gridSize.value, 0f))
             canvas.drawPath(yAxis, yAxisPaint)
         }
     }
     //画箭头
-    if (withArrow) {
+    if (coordinateConfig.withArrow) {
         val xArrows = Path()
         xArrows.moveTo(width - ChartConfig.horPadding, bottom - 15)
         xArrows.lineTo(width - ChartConfig.horPadding, bottom + 15)
         xArrows.lineTo(width - ChartConfig.horPadding + 30, bottom)
         xArrows.close()
-        xAxisPaint.style = PaintingStyle.Fill
+        coordinateConfig.axisPaint.style = PaintingStyle.Fill
         canvas.drawPath(xArrows, xAxisPaint)
 
         val yArrows = Path()
@@ -68,19 +60,14 @@ fun drawChartCoordinate(
         yArrows.lineTo(ChartConfig.horPadding + 15, ChartConfig.verPadding)
         yArrows.lineTo(ChartConfig.horPadding, ChartConfig.verPadding - 30)
         yArrows.close()
-        yAxisPaint.style = PaintingStyle.Fill
+
         canvas.drawPath(yArrows, yAxisPaint)
     }
 
     //画文字
-    if (withText) {
+    if (coordinateConfig.withText) {
         val txtSize = 24f
-        val textPaint = NativePaint().apply {
-            color = android.graphics.Color.BLACK
-            style = android.graphics.Paint.Style.FILL
-            strokeWidth = 1f
-            textSize = txtSize
-        }
+        val textPaint = coordinateConfig.textPaint
         val textCanvas = canvas.nativeCanvas
         //单位
         val xUt = if (xUnit.isNotEmpty()) {
@@ -126,8 +113,8 @@ fun drawLine(
     values: List<Float>,
     height: Float,
     width: Float,
+    lineConfig: LineConfig,
     dotClicked: MutableState<Int>?,
-    withDot: Boolean = true
 ) {
     val listDot = mutableListOf<Offset>()
     val bottom = height - ChartConfig.verPadding
@@ -147,27 +134,24 @@ fun drawLine(
         } else {
             line.lineTo(offset.x, offset.y)
         }
-        if (withDot) {
-            val dotPaint = Paint().apply {
+        if (lineConfig.withDot) {
+            val dotPaint = lineConfig.axisPaint.apply {
                 style = PaintingStyle.Fill
-                color = Color.Red
-                strokeWidth = 3f
             }
             canvas.drawCircle(offset, 8f, dotPaint)
         }
     }
-    val linePaint = Paint().apply {
+    val linePaint = lineConfig.axisPaint.apply {
         style = PaintingStyle.Stroke
-        color = Color.Red
-        strokeWidth = 2f
     }
     canvas.drawPath(line, linePaint)
 
     //保证信息显示在最上层
-    if (dotClicked != null && dotClicked.value != Int.MAX_VALUE) {
+    if (lineConfig.withInfo && dotClicked != null && dotClicked.value != Int.MAX_VALUE) {
         drawDotInfo(
             canvas = canvas,
             listDot = listDot,
+            textPaint = lineConfig.textPaint!!,
             width = width,
             witchOne = dotClicked.value
         )
@@ -177,6 +161,7 @@ fun drawLine(
 fun drawDotInfo(
     canvas: Canvas,
     listDot: List<Offset>,
+    textPaint: NativePaint,
     width: Float,
     witchOne: Int,
     info: String = "Let's write info about this dot."
@@ -203,18 +188,12 @@ fun drawDotInfo(
         strokeWidth = 3f
     }
 
-    val textPaint = NativePaint().apply {
-        color = android.graphics.Color.BLACK
-        style = android.graphics.Paint.Style.FILL
-        strokeWidth = 1f
-        textSize = 40f
-    }
-
     canvas.drawRect(infoStart, infoTop, infoEnd, infoBottom, infoRectPaint)
 
+    textPaint.textSize = 50f
     canvas.nativeCanvas.drawText("Title",
         center - textPaint.textSize,
-        infoTop + 50f,
+        infoTop + 60f,
         textPaint
     )
     textPaint.textSize = 30f

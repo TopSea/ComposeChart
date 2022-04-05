@@ -23,7 +23,7 @@ data class ChartConfig(
             }
         } else {
             if (scaleLimit == null) {
-                scaleLimit = IntRange(30, 200)
+                scaleLimit = IntRange(50, 200)
             }
         }
     }
@@ -63,7 +63,7 @@ data class LineConfig(
     var infoWidth: Float? = null,
     var textHeight: Float? = null,
     val axisPaint: Paint = Paint().apply {
-        color = Color.LightGray
+        color = Color.Red
         style = PaintingStyle.Stroke
         strokeWidth = 5f
     },

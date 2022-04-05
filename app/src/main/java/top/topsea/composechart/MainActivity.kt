@@ -42,7 +42,7 @@ class MainActivity : ComponentActivity() {
                         coordinate = coordinate,
                         line = line
                     )
-                    chart.scalable = false
+                    chart.scalable = true
                     Greeting(
                         chartConfig = chart
                     )
@@ -60,15 +60,17 @@ fun Greeting(
     if (chartConfig.line.withInfo) {
         dotClicked = remember { mutableStateOf(Int.MAX_VALUE) }
     }
+    val coordinateConfig = chartConfig.coordinate
+    val lineConfig = chartConfig.line
 
     var state: TransformableState? = null
     if (chartConfig.scalable) {
         state = rememberTransformableState { zoomChange, _, _ ->
-            if (ChartConfig.gridSize.value in 30f..200f) {
+            if (coordinateConfig.gridSize.value.toInt() in chartConfig.scaleLimit!!) {
                 ChartConfig.gridSize.value = ChartConfig.gridSize.value * zoomChange
             }
-            if (ChartConfig.gridSize.value < 30f) {
-                ChartConfig.gridSize.value = 30f
+            if (ChartConfig.gridSize.value < 50f) {
+                ChartConfig.gridSize.value = 50f
             }else if (ChartConfig.gridSize.value > 200f){
                 ChartConfig.gridSize.value = 200f
             }
@@ -78,18 +80,22 @@ fun Greeting(
     val values = chartConfig.line.listValue
 
     Canvas(
-        modifier = Modifier.fillMaxSize().setChartScalable(chartConfig, state)
+        modifier = Modifier
+            .fillMaxSize()
+            .setChartScalable(chartConfig, state)
             .setChartDotClickable(chartConfig, dotClicked)
     ) {
         drawChartCoordinate(
             canvas = drawContext.canvas,
             height = size.height,
-            width = size.width
+            width = size.width,
+            coordinateConfig = coordinateConfig
         )
         drawLine(
             canvas = drawContext.canvas,
             height = size.height,
             width = size.width,
+            lineConfig = lineConfig,
             values = values.value,
             dotClicked = dotClicked
         )
