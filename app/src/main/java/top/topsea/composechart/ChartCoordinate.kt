@@ -1,5 +1,6 @@
 package top.topsea.composechart
 
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.*
 import kotlin.math.floor
@@ -125,7 +126,7 @@ fun drawLine(
     values: List<Float>,
     height: Float,
     width: Float,
-    dotClicked: Int,
+    dotClicked: MutableState<Int>?,
     withDot: Boolean = true
 ) {
     val listDot = mutableListOf<Offset>()
@@ -163,12 +164,12 @@ fun drawLine(
     canvas.drawPath(line, linePaint)
 
     //保证信息显示在最上层
-    if (dotClicked != Int.MAX_VALUE) {
+    if (dotClicked != null && dotClicked.value != Int.MAX_VALUE) {
         drawDotInfo(
             canvas = canvas,
             listDot = listDot,
             width = width,
-            witchOne = dotClicked
+            witchOne = dotClicked.value
         )
     }
 }
