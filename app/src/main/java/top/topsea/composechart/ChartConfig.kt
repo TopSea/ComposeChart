@@ -11,12 +11,13 @@ data class ChartConfig(
     var coordinate: CoordinateConfig,
     var line: LineConfig,
     var scrollable: Boolean = true,
-    var scaleable: Boolean = true,
+    var scalable: Boolean = true,
+    var dotClickable: Boolean = true,
     var scaleLimit: IntRange? = null
 ) {
 
     init {
-        if (!scaleable) {
+        if (!scalable) {
             if (scaleLimit != null) {
                 scaleLimit = null
             }

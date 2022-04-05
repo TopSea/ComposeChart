@@ -42,7 +42,7 @@ class MainActivity : ComponentActivity() {
                         coordinate = coordinate,
                         line = line
                     )
-                    chart.scaleable = true
+                    chart.scalable = false
                     Greeting(
                         chartConfig = chart
                     )
@@ -62,7 +62,7 @@ fun Greeting(
     }
 
     var state: TransformableState? = null
-    if (chartConfig.scaleable) {
+    if (chartConfig.scalable) {
         state = rememberTransformableState { zoomChange, _, _ ->
             if (ChartConfig.gridSize.value in 30f..200f) {
                 ChartConfig.gridSize.value = ChartConfig.gridSize.value * zoomChange
@@ -78,34 +78,8 @@ fun Greeting(
     val values = chartConfig.line.listValue
 
     Canvas(
-        modifier = Modifier.fillMaxSize()
-            .transformable(state = state!!)
-            .pointerInput(Unit) {
-                detectTapGestures(
-                    onPress = { /* Called when the gesture starts */ },
-                    onDoubleTap = { /* Called on Double Tap */ },
-                    onLongPress = { /* Called on Long Press */ },
-                    onTap = { offset ->
-                        val xLines = floor(size.height / ChartConfig.gridSize.value).toInt()
-                        val bottom = (xLines - 1) * ChartConfig.gridSize.value + ChartConfig.verPadding
-
-                        values.value.forEachIndexed { index, _ ->
-                            val dotSizeX = IntRange(
-                                (ChartConfig.horPadding + index * ChartConfig.gridSize.value - 16f).toInt(),
-                                (ChartConfig.horPadding + index * ChartConfig.gridSize.value + 16f).toInt()
-                            )
-                            val dotSizeY = IntRange(
-                                (bottom - values.value[index] * ChartConfig.gridSize.value - 16f).toInt(),
-                                (bottom - values.value[index] * ChartConfig.gridSize.value + 16f).toInt()
-                            )
-                            if (offset.x.toInt() in dotSizeX && offset.y.toInt() in dotSizeY) {
-                                dotClicked!!.value = index
-                                println("gaohai:::clicked:$index")
-                            }
-                        }
-                    }
-                )
-            }
+        modifier = Modifier.fillMaxSize().setChartScalable(chartConfig, state)
+            .setChartDotClickable(chartConfig, dotClicked)
     ) {
         drawChartCoordinate(
             canvas = drawContext.canvas,
@@ -116,7 +90,6 @@ fun Greeting(
             canvas = drawContext.canvas,
             height = size.height,
             width = size.width,
-//            values = listOf(0f, 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f)
             values = values.value,
             dotClicked = dotClicked
         )
@@ -128,3 +101,45 @@ fun Greeting(
     }
 }
 
+private fun Modifier.setChartScalable(chartConfig: ChartConfig,
+                      state: TransformableState?) = this.then(
+    if (chartConfig.scalable) {
+        transformable(state!!)
+    } else {
+        Modifier
+    }
+)
+
+private fun Modifier.setChartDotClickable(chartConfig: ChartConfig, dotClicked: MutableState<Int>?) = this.then(
+    if (chartConfig.dotClickable) {
+        val values = chartConfig.line.listValue
+        pointerInput(Unit) {
+            detectTapGestures(
+                onPress = { /* Called when the gesture starts */ },
+                onDoubleTap = { /* Called on Double Tap */ },
+                onLongPress = { /* Called on Long Press */ },
+                onTap = { offset ->
+                    val xLines = floor(size.height / ChartConfig.gridSize.value).toInt()
+                    val bottom = (xLines - 1) * ChartConfig.gridSize.value + ChartConfig.verPadding
+
+                    values.value.forEachIndexed { index, _ ->
+                        val dotSizeX = IntRange(
+                            (ChartConfig.horPadding + index * ChartConfig.gridSize.value - 16f).toInt(),
+                            (ChartConfig.horPadding + index * ChartConfig.gridSize.value + 16f).toInt()
+                        )
+                        val dotSizeY = IntRange(
+                            (bottom - values.value[index] * ChartConfig.gridSize.value - 16f).toInt(),
+                            (bottom - values.value[index] * ChartConfig.gridSize.value + 16f).toInt()
+                        )
+                        if (offset.x.toInt() in dotSizeX && offset.y.toInt() in dotSizeY) {
+                            dotClicked!!.value = index
+                            println("gaohai:::clicked:$index")
+                        }
+                    }
+                }
+            )
+        }
+    } else {
+        Modifier
+    }
+)
