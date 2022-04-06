@@ -2,6 +2,7 @@ package top.topsea.composechart
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.NativePaint
 import androidx.compose.ui.graphics.Paint
@@ -55,10 +56,10 @@ data class CoordinateConfig(
 )
 
 data class LineConfig(
-    val listValue: MutableState<MutableList<Float>>,
+    val listValue: SnapshotStateList<Float>,
     var withDot: Boolean = true,
     var withInfo: Boolean = true,
-    var listInfo: MutableState<MutableList<Float>>? = null,
+    var listInfo: SnapshotStateList<Float>? = null,
     var textPaint: android.graphics.Paint? = null,
     var infoWidth: Float? = null,
     var textHeight: Float? = null,
@@ -69,16 +70,16 @@ data class LineConfig(
     },
 ) {
     init {
-        if (listValue.value.size < 1) {
+        if (listValue.size < 1) {
             throw RuntimeException("Must have values!!!")
         }
         if (withInfo && !withDot) {
             withDot = true
         }
-        if (withDot && (listInfo == null || listInfo!!.value.size < 1)) {
+        if (withDot && (listInfo == null || listInfo!!.size < 1)) {
             throw RuntimeException("Must have info!!!")
         }
-        if (listInfo != null && listInfo!!.value.size > 1) {
+        if (listInfo != null && listInfo!!.size > 1) {
             textPaint = NativePaint().apply {
                 color = android.graphics.Color.BLACK
                 style = android.graphics.Paint.Style.FILL

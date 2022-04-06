@@ -5,10 +5,12 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.*
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
@@ -17,6 +19,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.debugInspectorInfo
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import top.topsea.composechart.ui.theme.ComposeChartTheme
 import kotlin.math.floor
 
@@ -31,8 +35,10 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    val values = remember { mutableStateOf(mutableListOf(0f, 1f, 2f, 3f, 4f, 5f, 6f, 7f,)) }
-                    val info = remember { mutableStateOf(mutableListOf(0f, 1f, 2f, 3f, 4f, 5f, 6f, 7f,)) }
+                    val scope = rememberCoroutineScope()
+                    val values = remember { mutableStateListOf(0f, 1f, 2f, 3f, 4f, 5f, 6f, 7f) }
+
+                    val info = remember { mutableStateListOf(0f, 1f, 2f, 3f, 4f, 5f, 6f, 7f) }
                     val line = LineConfig(
                         listValue = values,
                         listInfo = info
@@ -46,6 +52,13 @@ class MainActivity : ComponentActivity() {
                     Greeting(
                         chartConfig = chart
                     )
+                    LaunchedEffect(key1 = Unit) {
+                        while (values.size < 20) {
+                            delay(2000)
+                            values.add(values.size + 1f)
+                        }
+                        println("gaohai:::${values.last()}")
+                    }
                 }
             }
         }
@@ -96,7 +109,7 @@ fun Greeting(
             height = size.height,
             width = size.width,
             lineConfig = lineConfig,
-            values = values.value,
+            values = values,
             dotClicked = dotClicked
         )
         drawLine(
@@ -128,14 +141,14 @@ private fun Modifier.setChartDotClickable(chartConfig: ChartConfig, dotClicked: 
                     val xLines = floor(size.height / ChartConfig.gridSize.value).toInt()
                     val bottom = (xLines - 1) * ChartConfig.gridSize.value + ChartConfig.verPadding
 
-                    values.value.forEachIndexed { index, _ ->
+                    values.forEachIndexed { index, _ ->
                         val dotSizeX = IntRange(
                             (ChartConfig.horPadding + index * ChartConfig.gridSize.value - 16f).toInt(),
                             (ChartConfig.horPadding + index * ChartConfig.gridSize.value + 16f).toInt()
                         )
                         val dotSizeY = IntRange(
-                            (bottom - values.value[index] * ChartConfig.gridSize.value - 16f).toInt(),
-                            (bottom - values.value[index] * ChartConfig.gridSize.value + 16f).toInt()
+                            (bottom - values[index] * ChartConfig.gridSize.value - 16f).toInt(),
+                            (bottom - values[index] * ChartConfig.gridSize.value + 16f).toInt()
                         )
                         if (offset.x.toInt() in dotSizeX && offset.y.toInt() in dotSizeY) {
                             dotClicked!!.value = index
