@@ -4,14 +4,14 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.*
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.debugInspectorInfo
+import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import top.topsea.composechart.ui.theme.ComposeChartTheme
@@ -51,6 +52,8 @@ class MainActivity : ComponentActivity() {
                     Greeting(
                         chartConfig = chart
                     )
+
+
 //                    LaunchedEffect(key1 = Unit) {
 //                        while (values.size < 20) {
 //                            delay(2000)
@@ -75,6 +78,10 @@ fun Greeting(
     val coordinateConfig = chartConfig.coordinate
     val lineConfig = chartConfig.line
 
+    var scrollState:ScrollState? = null
+    if (chartConfig.scrollable) {
+        scrollState = rememberScrollState()
+    }
     var state: TransformableState? = null
     if (chartConfig.scalable) {
         state = rememberTransformableState { zoomChange, _, _ ->
@@ -91,31 +98,39 @@ fun Greeting(
 
     val values = chartConfig.line.listValue
 
-    Canvas(
+    Row(
         modifier = Modifier
             .fillMaxSize()
-            .setChartScalable(chartConfig, state)
-            .setChartDotClickable(chartConfig, dotClicked)
+            .horizontalScroll(scrollState!!)
     ) {
-        drawChartCoordinate(
-            canvas = drawContext.canvas,
-            height = size.height,
-            width = size.width,
-            coordinateConfig = coordinateConfig
-        )
-        drawLine(
-            canvas = drawContext.canvas,
-            height = size.height,
-            width = size.width,
-            lineConfig = lineConfig,
-            values = values,
-            dotClicked = dotClicked
-        )
-        drawLine(
-            color = Color.Blue,
-            start = Offset.Zero,
-            end = Offset(size.width, size.height)
-        )
+        Canvas(
+            modifier = Modifier
+                .fillMaxHeight()
+                .requiredWidth(800.dp)
+                .setChartScalable(chartConfig, state)
+                .setChartDotClickable(chartConfig, dotClicked)
+        ) {
+            drawChartCoordinate(
+                canvas = drawContext.canvas,
+                height = size.height,
+                width = size.width,
+                coordinateConfig = coordinateConfig
+            )
+            drawLine(
+                canvas = drawContext.canvas,
+                height = size.height,
+                width = size.width,
+                lineConfig = lineConfig,
+                values = values,
+                dotClicked = dotClicked
+            )
+            drawLine(
+                color = Color.Blue,
+                start = Offset.Zero,
+                end = Offset(size.width, size.height)
+            )
+        }
+//        Text(text = "123")
     }
 }
 
@@ -123,6 +138,15 @@ private fun Modifier.setChartScalable(chartConfig: ChartConfig,
                       state: TransformableState?) = this.then(
     if (chartConfig.scalable) {
         transformable(state!!)
+    } else {
+        Modifier
+    }
+)
+
+private fun Modifier.setChartScrollable(chartConfig: ChartConfig,
+                      scrollState: ScrollState?) = this.then(
+    if (chartConfig.scalable) {
+        scrollable(scrollState!!, Orientation.Horizontal)
     } else {
         Modifier
     }
