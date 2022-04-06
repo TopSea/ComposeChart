@@ -35,7 +35,6 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    val scope = rememberCoroutineScope()
                     val values = remember { mutableStateListOf(0f, 1f, 2f, 3f, 4f, 5f, 6f, 7f) }
 
                     val info = remember { mutableStateListOf(0f, 1f, 2f, 3f, 4f, 5f, 6f, 7f) }
@@ -52,13 +51,13 @@ class MainActivity : ComponentActivity() {
                     Greeting(
                         chartConfig = chart
                     )
-                    LaunchedEffect(key1 = Unit) {
-                        while (values.size < 20) {
-                            delay(2000)
-                            values.add(values.size + 1f)
-                        }
-                        println("gaohai:::${values.last()}")
-                    }
+//                    LaunchedEffect(key1 = Unit) {
+//                        while (values.size < 20) {
+//                            delay(2000)
+//                            values.add(values.size + 1f)
+//                        }
+//                        println("gaohai:::${values.last()}")
+//                    }
                 }
             }
         }
@@ -138,8 +137,7 @@ private fun Modifier.setChartDotClickable(chartConfig: ChartConfig, dotClicked: 
                 onDoubleTap = { /* Called on Double Tap */ },
                 onLongPress = { /* Called on Long Press */ },
                 onTap = { offset ->
-                    val xLines = floor(size.height / ChartConfig.gridSize.value).toInt()
-                    val bottom = (xLines - 1) * ChartConfig.gridSize.value + ChartConfig.verPadding
+                    val bottom = size.height - ChartConfig.verPadding
 
                     values.forEachIndexed { index, _ ->
                         val dotSizeX = IntRange(
@@ -152,7 +150,6 @@ private fun Modifier.setChartDotClickable(chartConfig: ChartConfig, dotClicked: 
                         )
                         if (offset.x.toInt() in dotSizeX && offset.y.toInt() in dotSizeY) {
                             dotClicked!!.value = index
-                            println("gaohai:::clicked:$index")
                         }
                     }
                 }
