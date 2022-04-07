@@ -9,51 +9,89 @@ fun drawChartCoordinate(
     canvas: Canvas,
     height: Float,
     width: Float,
+    chartLayout: Int,
     coordinateConfig: CoordinateConfig,
     xUnit: String = "元",
     yUnit: String = "斤",
 ) {
-    val xLines = (height / ChartConfig.gridSize.value).toInt()
-    val yLines = (width / ChartConfig.gridSize.value).toInt()
+
+    val xEnd = width - ChartConfig.horPadding
+    val yEnd = height - ChartConfig.verPadding
+
+    //画网格
+    drawAxisAndArrows(
+        canvas = canvas,
+        axisPaint = coordinateConfig.axisPaint,
+        xEnd = xEnd,
+        yEnd = yEnd,
+        withGrid = coordinateConfig.withGrid,
+        withArrow = coordinateConfig.withArrow
+    )
+
+    //画文字
+    if (coordinateConfig.withText) {
+        drawCoordinateText(
+            canvas = canvas,
+            textPaint = coordinateConfig.textPaint,
+            xEnd = xEnd,
+            yEnd = yEnd,
+            xUnit = xUnit,
+            yUnit = yUnit,
+        )
+    }
+}
+
+/**
+ * @param xEnd: 宽减去padding
+ * @param yEnd: 高减去padding
+ */
+private fun drawAxisAndArrows(
+    canvas: Canvas,
+    axisPaint: Paint,
+    xEnd: Float,
+    yEnd: Float,
+    withGrid: Boolean,
+    withArrow: Boolean
+) {
     val xAxis = Path()
-    val bottom = height - ChartConfig.verPadding
     //减去20是为了创造出交叉效果
-    xAxis.moveTo((ChartConfig.horPadding - 20), bottom)
-    xAxis.lineTo(width - ChartConfig.horPadding, bottom)
-    coordinateConfig.axisPaint.strokeWidth = 5f
-    coordinateConfig.axisPaint.style = PaintingStyle.Stroke
-    val xAxisPaint = coordinateConfig.axisPaint
-    canvas.drawPath(xAxis, xAxisPaint)
+    xAxis.moveTo((ChartConfig.horPadding - 20), yEnd)
+    xAxis.lineTo(xEnd, yEnd)
+    axisPaint.apply {
+        strokeWidth = 5f
+        style = PaintingStyle.Stroke
+    }
+    canvas.drawPath(xAxis, axisPaint)
 
     val yAxis = Path()
     //加上20是为了创造出交叉效果
     yAxis.moveTo(ChartConfig.horPadding, ChartConfig.verPadding)
-    yAxis.lineTo(ChartConfig.horPadding, bottom + 20f)
-    val yAxisPaint = coordinateConfig.axisPaint
-    canvas.drawPath(yAxis, yAxisPaint)
+    yAxis.lineTo(ChartConfig.horPadding, yEnd + 20f)
+    canvas.drawPath(yAxis, axisPaint)
 
-    //画网格
-    if (coordinateConfig.withGrid) {
-        coordinateConfig.axisPaint.strokeWidth = 2f
+    if (withGrid) {
+        val xLines = (yEnd / ChartConfig.gridSize.value).toInt()
+        val yLines = (xEnd / ChartConfig.gridSize.value).toInt()
+        axisPaint.strokeWidth = 2f
         for (i in 1 until xLines - 1) {
             xAxis.translate(Offset(0f, -ChartConfig.gridSize.value))
-            canvas.drawPath(xAxis, xAxisPaint)
+            canvas.drawPath(xAxis, axisPaint)
         }
 
         for (i in 1 until yLines - 1) {
             yAxis.translate(Offset(ChartConfig.gridSize.value, 0f))
-            canvas.drawPath(yAxis, yAxisPaint)
+            canvas.drawPath(yAxis, axisPaint)
         }
     }
-    //画箭头
-    if (coordinateConfig.withArrow) {
+
+    if (withArrow) {
         val xArrows = Path()
-        xArrows.moveTo(width - ChartConfig.horPadding, bottom - 15)
-        xArrows.lineTo(width - ChartConfig.horPadding, bottom + 15)
-        xArrows.lineTo(width - ChartConfig.horPadding + 30, bottom)
+        xArrows.moveTo(xEnd, yEnd - 15)
+        xArrows.lineTo(xEnd, yEnd + 15)
+        xArrows.lineTo(xEnd + 30, yEnd)
         xArrows.close()
-        coordinateConfig.axisPaint.style = PaintingStyle.Fill
-        canvas.drawPath(xArrows, xAxisPaint)
+        axisPaint.style = PaintingStyle.Fill
+        canvas.drawPath(xArrows, axisPaint)
 
         val yArrows = Path()
         yArrows.moveTo(ChartConfig.horPadding - 15, ChartConfig.verPadding)
@@ -61,50 +99,57 @@ fun drawChartCoordinate(
         yArrows.lineTo(ChartConfig.horPadding, ChartConfig.verPadding - 30)
         yArrows.close()
 
-        canvas.drawPath(yArrows, yAxisPaint)
+        canvas.drawPath(yArrows, axisPaint)
     }
+}
 
-    //画文字
-    if (coordinateConfig.withText) {
-        val txtSize = 24f
-        val textPaint = coordinateConfig.textPaint
-        val textCanvas = canvas.nativeCanvas
-        //单位
-        val xUt = if (xUnit.isNotEmpty()) {
-            "x($xUnit)"
-        } else {
-            "x"
-        }
-        val yUt = if (yUnit.isNotEmpty()) {
-            "y($yUnit)"
-        } else {
-            "y"
-        }
-        textCanvas.drawText(xUt,
-            width - ChartConfig.horPadding,
-            bottom + txtSize * 1.5f,
+private fun drawCoordinateText(
+    canvas: Canvas,
+    textPaint: NativePaint,
+    xEnd: Float,
+    yEnd: Float,
+    xUnit: String,
+    yUnit: String,
+) {
+    val xLines = (yEnd / ChartConfig.gridSize.value).toInt()
+    val yLines = (xEnd / ChartConfig.gridSize.value).toInt()
+    val txtSize = textPaint.textSize
+    val textCanvas = canvas.nativeCanvas
+    //单位
+    val xUt = if (xUnit.isNotEmpty()) {
+        "x($xUnit)"
+    } else {
+        "x"
+    }
+    val yUt = if (yUnit.isNotEmpty()) {
+        "y($yUnit)"
+    } else {
+        "y"
+    }
+    textCanvas.drawText(xUt,
+        xEnd,
+        yEnd + txtSize * 1.5f,
+        textPaint
+    )
+    textCanvas.drawText(yUt,
+        ChartConfig.horPadding - txtSize * 2f,
+        ChartConfig.verPadding,
+        textPaint
+    )
+
+    for (i in 0 until yLines - 1) {
+        textCanvas.drawText(i.toString(),
+            ChartConfig.horPadding - txtSize / 2 + (i * ChartConfig.gridSize.value),
+            yEnd + txtSize,
             textPaint
         )
-        textCanvas.drawText(yUt,
-            ChartConfig.horPadding - txtSize * 2f,
-            ChartConfig.verPadding,
+    }
+    for (j in xLines - 2 downTo 1) {
+        textCanvas.drawText(j.toString(),
+            ChartConfig.horPadding - txtSize * 2,
+            yEnd + txtSize / 2 - (j * ChartConfig.gridSize.value),
             textPaint
         )
-
-        for (i in 0 until yLines - 1) {
-            textCanvas.drawText(i.toString(),
-                ChartConfig.horPadding - txtSize / 2 + (i * ChartConfig.gridSize.value),
-                bottom + txtSize,
-                textPaint
-            )
-        }
-        for (j in xLines - 2 downTo 1) {
-            textCanvas.drawText(j.toString(),
-                ChartConfig.horPadding - txtSize * 2,
-                bottom + txtSize / 2 - (j * ChartConfig.gridSize.value),
-                textPaint
-            )
-        }
     }
 }
 

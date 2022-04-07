@@ -114,6 +114,7 @@ fun Greeting(
                 canvas = drawContext.canvas,
                 height = size.height,
                 width = size.width,
+                chartLayout = chartConfig.chartLayout,
                 coordinateConfig = coordinateConfig
             )
             drawLine(

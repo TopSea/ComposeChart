@@ -11,6 +11,7 @@ import androidx.compose.ui.graphics.PaintingStyle
 data class ChartConfig(
     var coordinate: CoordinateConfig,
     var line: LineConfig,
+    var chartLayout: Int = LAYOUT_ALL_POS,
     var scrollable: Boolean = true,
     var scalable: Boolean = true,
     var dotClickable: Boolean = true,
@@ -29,6 +30,13 @@ data class ChartConfig(
         }
     }
     companion object {
+        //全象限
+        const val LAYOUT_ALL = 100
+        //一二象限
+        const val LAYOUT_X_POS = 200
+        //一象限
+        const val LAYOUT_ALL_POS = 300
+
         const val horPadding = 80f
         const val verPadding = 60f
         var gridSize = mutableStateOf(100f)
