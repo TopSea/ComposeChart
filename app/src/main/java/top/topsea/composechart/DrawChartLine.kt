@@ -49,7 +49,7 @@ fun drawLine(
         drawDotInfo(
             canvas = canvas,
             listDot = listDot,
-            textPaint = lineConfig.textPaint!!,
+            lineConfig = lineConfig,
             width = width,
             witchOne = dotClicked.value
         )
@@ -116,23 +116,24 @@ private fun handleValues(
 private fun drawDotInfo(
     canvas: Canvas,
     listDot: List<Offset>,
-    textPaint: NativePaint,
+    lineConfig: LineConfig,
     width: Float,
     witchOne: Int,
     info: String = "Let's write info about this dot."
 ) {
+    val textPaint = lineConfig.textPaint!!
     var infoStart = listDot[witchOne].x
-    var infoEnd = listDot[witchOne].x + ChartConfig.infoWidth * 2
-    var infoTop = listDot[witchOne].y - ChartConfig.infoHeight
+    var infoEnd = listDot[witchOne].x + lineConfig.infoWidth!! * 2
+    var infoTop = listDot[witchOne].y - lineConfig.infoHeight!!
     var infoBottom = listDot[witchOne].y
 
     if (infoEnd > width) {
-        infoStart = listDot[witchOne].x - ChartConfig.infoWidth * 2
+        infoStart = listDot[witchOne].x - lineConfig.infoWidth!! * 2
         infoEnd = listDot[witchOne].x
     }
     if (infoTop < 0) {
         infoTop = listDot[witchOne].y
-        infoBottom = listDot[witchOne].y + ChartConfig.infoHeight
+        infoBottom = listDot[witchOne].y + lineConfig.infoHeight!!
     }
     val center = (infoStart + infoEnd) / 2
 
@@ -143,7 +144,16 @@ private fun drawDotInfo(
         strokeWidth = 3f
     }
 
-    canvas.drawRect(infoStart, infoTop, infoEnd, infoBottom, infoRectPaint)
+    canvas.drawRoundRect(
+        left = infoStart,
+        top = infoTop,
+        right = infoEnd,
+        bottom = infoBottom,
+        radiusX = 15f,
+        radiusY = 15f,
+        infoRectPaint
+    )
+//    canvas.drawRect(infoStart, infoTop, infoEnd, infoBottom, infoRectPaint)
 
     textPaint.textSize = 50f
     canvas.nativeCanvas.drawText("Title",
@@ -154,7 +164,7 @@ private fun drawDotInfo(
     textPaint.textSize = 30f
 
     //内容过长需要换行
-    val limit = ChartConfig.infoWidth - 40f
+    val limit = lineConfig.infoWidth!! - 40f
     val limitChars = (limit / 6f).toInt()
     if (info.length > limitChars) {
         val subStr1 = info.substring(0, limitChars)

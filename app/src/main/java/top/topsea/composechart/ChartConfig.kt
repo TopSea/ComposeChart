@@ -40,8 +40,6 @@ data class ChartConfig(
         const val horPadding = 80f
         const val verPadding = 60f
         var gridSize = mutableStateOf(100f)
-        const val infoWidth = 160f
-        const val infoHeight = 200f
     }
 }
 
@@ -70,7 +68,7 @@ data class LineConfig(
     var listInfo: SnapshotStateList<Float>? = null,
     var textPaint: android.graphics.Paint? = null,
     var infoWidth: Float? = null,
-    var textHeight: Float? = null,
+    var infoHeight: Float? = null,
     val axisPaint: Paint = Paint().apply {
         color = Color.Red
         style = PaintingStyle.Stroke
@@ -95,12 +93,12 @@ data class LineConfig(
                 textSize = 24f
             }
             infoWidth = 160f
-            textHeight = 200f
+            infoHeight = 220f
         } else {
             //没有就别占内存了
             textPaint = null
             infoWidth = null
-            textHeight = null
+            infoHeight = null
         }
     }
 }
