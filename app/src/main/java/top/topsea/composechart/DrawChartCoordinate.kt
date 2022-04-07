@@ -143,7 +143,7 @@ private fun drawAxisAndArrows(
                 }
 
                 yAxis.translate(Offset(-(yLines / 2 * ChartConfig.gridSize.value), 0f))
-                for (i in 1 until yLines - 1) {
+                for (i in 1 until yLines) {
                     if (i == yLines / 2) {
                         continue
                     }

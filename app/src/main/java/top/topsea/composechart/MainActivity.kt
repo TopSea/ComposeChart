@@ -26,7 +26,7 @@ import top.topsea.composechart.ui.theme.ComposeChartTheme
 import kotlin.math.floor
 
 class MainActivity : ComponentActivity() {
-    @SuppressLint("MutableCollectionMutableState")
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -122,6 +122,7 @@ fun Greeting(
                 canvas = drawContext.canvas,
                 height = size.height,
                 width = size.width,
+                chartLayout = chartConfig.chartLayout,
                 lineConfig = lineConfig,
                 values = values,
                 dotClicked = dotClicked
