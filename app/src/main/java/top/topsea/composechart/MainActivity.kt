@@ -47,7 +47,7 @@ class MainActivity : ComponentActivity() {
                     val chart = ChartConfig(
                         coordinate = coordinate,
                         line = line,
-                        chartLayout = ChartConfig.LAYOUT_ALL
+                        chartLayout = ChartConfig.LAYOUT_X_POS
                     )
                     chart.scalable = true
                     Greeting(

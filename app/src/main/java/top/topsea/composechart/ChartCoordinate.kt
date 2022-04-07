@@ -170,6 +170,60 @@ private fun drawAxisAndArrows(
                 canvas.drawPath(yArrows, axisPaint)
             }
         }
+        ChartConfig.LAYOUT_X_POS -> {
+            val xLines = (yEnd / ChartConfig.gridSize.value).toInt()
+            val yLines = (xEnd / ChartConfig.gridSize.value).toInt()
+            //y轴的x位置
+            val yAxisPosition = ChartConfig.horPadding + yLines / 2 * ChartConfig.gridSize.value
+            //减去20是为了创造出交叉效果
+            xAxis.moveTo((ChartConfig.horPadding - 20), yEnd)
+            xAxis.lineTo(xEnd, yEnd)
+            axisPaint.apply {
+                strokeWidth = 5f
+                style = PaintingStyle.Stroke
+            }
+            canvas.drawPath(xAxis, axisPaint)
+
+            //加上20是为了创造出交叉效果
+            yAxis.moveTo(yAxisPosition, ChartConfig.verPadding)
+            yAxis.lineTo(yAxisPosition, yEnd + 20f)
+            canvas.drawPath(yAxis, axisPaint)
+
+            if (withGrid) {
+                axisPaint.strokeWidth = 2f
+                for (i in 1 until xLines) {
+                    xAxis.translate(Offset(0f, -ChartConfig.gridSize.value))
+                    canvas.drawPath(xAxis, axisPaint)
+                }
+
+                yAxis.translate(Offset(-(yLines / 2 * ChartConfig.gridSize.value), 0f))
+                for (i in 1 until yLines) {
+                    if (i == yLines / 2) {
+                        continue
+                    }
+                    yAxis.translate(Offset(ChartConfig.gridSize.value, 0f))
+                    canvas.drawPath(yAxis, axisPaint)
+                }
+            }
+
+            if (withArrow) {
+                val xArrows = Path()
+                xArrows.moveTo(xEnd, yEnd - 15)
+                xArrows.lineTo(xEnd, yEnd + 15)
+                xArrows.lineTo(xEnd + 30, yEnd)
+                xArrows.close()
+                axisPaint.style = PaintingStyle.Fill
+                canvas.drawPath(xArrows, axisPaint)
+
+                val yArrows = Path()
+                yArrows.moveTo(yAxisPosition - 15, ChartConfig.verPadding)
+                yArrows.lineTo(yAxisPosition + 15, ChartConfig.verPadding)
+                yArrows.lineTo(yAxisPosition, ChartConfig.verPadding - 30)
+                yArrows.close()
+
+                canvas.drawPath(yArrows, axisPaint)
+            }
+        }
     }
 }
 
@@ -274,6 +328,54 @@ private fun drawCoordinateText(
                 textCanvas.drawText(j.toString(),
                     yAxisPosition - txtSize * 1.5f,
                     yEnd + txtSize / 2 - (current * ChartConfig.gridSize.value),
+                    textPaint
+                )
+                current++
+            }
+        }
+        ChartConfig.LAYOUT_X_POS -> {
+            val xLines = (yEnd / ChartConfig.gridSize.value).toInt()
+            val yLines = (xEnd / ChartConfig.gridSize.value).toInt()
+            //y轴的x位置
+            val yAxisPosition = ChartConfig.horPadding + yLines / 2 * ChartConfig.gridSize.value
+            val txtSize = textPaint.textSize
+            val textCanvas = canvas.nativeCanvas
+            //单位
+            val xUt = if (xUnit.isNotEmpty()) {
+                "x($xUnit)"
+            } else {
+                "x"
+            }
+            val yUt = if (yUnit.isNotEmpty()) {
+                "y($yUnit)"
+            } else {
+                "y"
+            }
+            textCanvas.drawText(xUt,
+                xEnd,
+                yEnd + txtSize * 1.5f,
+                textPaint
+            )
+            textCanvas.drawText(yUt,
+                yAxisPosition - txtSize * 2f,
+                ChartConfig.verPadding,
+                textPaint
+            )
+
+            var current = 0
+            for (i in -yLines / 2 until yLines / 2) {
+                textCanvas.drawText(i.toString(),
+                    ChartConfig.horPadding - txtSize / 2 + (current * ChartConfig.gridSize.value),
+                    yEnd + txtSize,
+                    textPaint
+                )
+                current++
+            }
+
+            for (j in xLines - 1 downTo 1) {
+                textCanvas.drawText(j.toString(),
+                    yAxisPosition - txtSize * 1.5f,
+                    yEnd + txtSize / 2 - (j * ChartConfig.gridSize.value),
                     textPaint
                 )
                 current++
