@@ -1,5 +1,6 @@
 package top.topsea.composechart
 
+import androidx.compose.material.contentColorFor
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.*
@@ -256,7 +257,7 @@ private fun drawCoordinateText(
             )
 
             var current = 0
-            for (i in -yLines / 2 + 1 until yLines / 2) {
+            for (i in -yLines / 2 until yLines / 2) {
                 textCanvas.drawText(i.toString(),
                     ChartConfig.horPadding - txtSize / 2 + (current * ChartConfig.gridSize.value),
                     xAxisPosition + txtSize,
@@ -265,9 +266,13 @@ private fun drawCoordinateText(
                 current++
             }
             current = 0
-            for (j in -xLines / 2 + 1 until xLines / 2) {
+            for (j in -xLines / 2 until xLines / 2) {
+                if (j == 0) {
+                    current++
+                    continue
+                }
                 textCanvas.drawText(j.toString(),
-                    yAxisPosition - txtSize * 2,
+                    yAxisPosition - txtSize * 1.5f,
                     yEnd + txtSize / 2 - (current * ChartConfig.gridSize.value),
                     textPaint
                 )
