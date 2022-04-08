@@ -33,7 +33,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    val values = remember { mutableStateListOf(0f, 1f, 2f, 3f, 4f, 5f, 6f, 7f) }
+                    val values = remember { mutableStateListOf(0f, 1f, 2f, 1f, 1f, 5f, 6f, 3f) }
 
                     val info = remember { mutableStateListOf(0f, 1f, 2f, 3f, 4f, 5f, 6f, 7f) }
                     val line = LineConfig(
@@ -44,7 +44,7 @@ class MainActivity : ComponentActivity() {
                     val chart = ChartConfig(
                         coordinate = coordinate,
                         line = line,
-                        chartLayout = ChartConfig.LAYOUT_X_POS
+                        chartLayout = ChartConfig.LAYOUT_ALL_POS
                     )
                     chart.scalable = true
                     Greeting(
@@ -114,19 +114,22 @@ fun Greeting(
                 chartLayout = chartConfig.chartLayout,
                 coordinateConfig = coordinateConfig
             )
-            drawLine(
+//            drawLine(
+//                canvas = drawContext.canvas,
+//                height = size.height,
+//                width = size.width,
+//                chartLayout = chartConfig.chartLayout,
+//                lineConfig = lineConfig,
+//                values = values,
+//                dotClicked = dotClicked
+//            )
+            drawCurve(
                 canvas = drawContext.canvas,
                 height = size.height,
                 width = size.width,
                 chartLayout = chartConfig.chartLayout,
                 lineConfig = lineConfig,
                 values = values,
-                dotClicked = dotClicked
-            )
-            drawLine(
-                color = Color.Blue,
-                start = Offset.Zero,
-                end = Offset(size.width, size.height)
             )
         }
 //        Text(text = "123")

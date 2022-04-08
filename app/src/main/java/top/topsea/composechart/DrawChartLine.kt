@@ -1,8 +1,10 @@
 package top.topsea.composechart
 
+import android.graphics.PointF
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.*
+import kotlin.math.abs
 
 
 fun drawLine(
@@ -192,4 +194,76 @@ private fun drawDotInfo(
         color = Color.Red
         strokeWidth = 3f
     })
+}
+
+fun drawCurve(
+    canvas: Canvas,
+    values: List<Float>,
+    height: Float,
+    width: Float,
+    chartLayout: Int,
+    lineConfig: LineConfig,
+) {
+
+    val xEnd = width - ChartConfig.horPadding
+    val yEnd = height - ChartConfig.verPadding
+
+    val listDot = handleValues(
+        values = values,
+        xEnd = xEnd,
+        yEnd = yEnd,
+        chartLayout = chartLayout
+    )
+
+    val curvePath = Path()
+    curvePath.moveTo(listDot.first().x, listDot.first().y)
+
+    for (index in 0 until listDot.size - 1) {
+        val xMoveDistance = 10
+        val yMoveDistance = 20
+
+        if (listDot[index].y == listDot[index + 1].y) {
+            curvePath.lineTo(listDot[index + 1].x, listDot[index + 1].y)
+        } else {
+            val centerX = (listDot[index].x + listDot[index + 1].x) / 2
+            val centerY = (listDot[index].y + listDot[index + 1].y) / 2
+            val smoothX = abs(listDot[index].y - listDot[index + 1].y) * 0.1f
+            val smoothY = abs(listDot[index].y - listDot[index + 1].y) * 0.2f
+
+            if (listDot[index].y < listDot[index + 1].y) {
+                val ctlX0 = (listDot[index].x + centerX) / 2 + smoothX
+                val ctlY0 = (listDot[index].y + centerY) / 2 - smoothY
+                val ctlX1 = (centerX + listDot[index + 1].x) / 2 - smoothX
+                val ctlY1 = (centerY + listDot[index + 1].y) / 2 + smoothY
+                curvePath.cubicTo(
+                    ctlX0 + xMoveDistance,
+                    ctlY0 - yMoveDistance,
+                    ctlX1 - xMoveDistance,
+                    ctlY1 + yMoveDistance,
+                    listDot[index + 1].x,
+                    listDot[index + 1].y
+                )
+            } else {
+                val ctlX0 = (listDot[index].x + centerX) / 2 + smoothX
+                val ctlY0 = (listDot[index].y + centerY) / 2 + smoothY
+                val ctlX1 = (centerX + listDot[index + 1].x) / 2 - smoothX
+                val ctlY1 = (centerY + listDot[index + 1].y) / 2 - smoothY
+                curvePath.cubicTo(
+                    ctlX0 + xMoveDistance,
+                    ctlY0 + yMoveDistance,
+                    ctlX1 - xMoveDistance,
+                    ctlY1 - yMoveDistance,
+                    listDot[index + 1].x,
+                    listDot[index + 1].y
+                )
+
+            }
+        }
+    }
+
+
+    val linePaint = lineConfig.axisPaint.apply {
+        style = PaintingStyle.Stroke
+    }
+    canvas.drawPath(curvePath, linePaint)
 }
