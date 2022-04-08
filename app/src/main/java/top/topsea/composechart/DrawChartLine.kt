@@ -155,7 +155,6 @@ private fun drawDotInfo(
         radiusY = 15f,
         infoRectPaint
     )
-//    canvas.drawRect(infoStart, infoTop, infoEnd, infoBottom, infoRectPaint)
 
     textPaint.textSize = 50f
     canvas.nativeCanvas.drawText("Title",
@@ -203,6 +202,7 @@ fun drawCurve(
     width: Float,
     chartLayout: Int,
     lineConfig: LineConfig,
+    dotClicked: MutableState<Int>?,
 ) {
 
     val xEnd = width - ChartConfig.horPadding
@@ -221,6 +221,13 @@ fun drawCurve(
     for (index in 0 until listDot.size - 1) {
         val xMoveDistance = 10
         val yMoveDistance = 20
+
+        if (lineConfig.withDot) {
+            val dotPaint = lineConfig.axisPaint.apply {
+                style = PaintingStyle.Fill
+            }
+            canvas.drawCircle(listDot[index], 8f, dotPaint)
+        }
 
         if (listDot[index].y == listDot[index + 1].y) {
             curvePath.lineTo(listDot[index + 1].x, listDot[index + 1].y)
@@ -256,14 +263,30 @@ fun drawCurve(
                     listDot[index + 1].x,
                     listDot[index + 1].y
                 )
-
             }
         }
     }
 
+    if (lineConfig.withDot) {
+        val dotPaint = lineConfig.axisPaint.apply {
+            style = PaintingStyle.Fill
+        }
+        canvas.drawCircle(listDot.last(), 8f, dotPaint)
+    }
 
     val linePaint = lineConfig.axisPaint.apply {
         style = PaintingStyle.Stroke
     }
     canvas.drawPath(curvePath, linePaint)
+
+    //保证信息显示在最上层
+    if (lineConfig.withInfo && dotClicked != null && dotClicked.value != Int.MAX_VALUE) {
+        drawDotInfo(
+            canvas = canvas,
+            listDot = listDot,
+            lineConfig = lineConfig,
+            width = width,
+            witchOne = dotClicked.value
+        )
+    }
 }

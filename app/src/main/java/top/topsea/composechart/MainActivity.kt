@@ -44,7 +44,7 @@ class MainActivity : ComponentActivity() {
                     val chart = ChartConfig(
                         coordinate = coordinate,
                         line = line,
-                        chartLayout = ChartConfig.LAYOUT_ALL_POS
+                        chartLayout = ChartConfig.LAYOUT_ALL
                     )
                     chart.scalable = true
                     Greeting(
@@ -125,11 +125,12 @@ fun Greeting(
 //            )
             drawCurve(
                 canvas = drawContext.canvas,
+                values = values,
                 height = size.height,
                 width = size.width,
                 chartLayout = chartConfig.chartLayout,
                 lineConfig = lineConfig,
-                values = values,
+                dotClicked = dotClicked
             )
         }
 //        Text(text = "123")
