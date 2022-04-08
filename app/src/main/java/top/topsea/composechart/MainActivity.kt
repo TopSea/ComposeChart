@@ -1,29 +1,26 @@
 package top.topsea.composechart
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.*
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.gestures.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.requiredWidth
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import top.topsea.composechart.ui.theme.ComposeChartTheme
-import kotlin.math.floor
 
 class MainActivity : ComponentActivity() {
 
@@ -53,7 +50,6 @@ class MainActivity : ComponentActivity() {
                     Greeting(
                         chartConfig = chart
                     )
-
 
 //                    LaunchedEffect(key1 = Unit) {
 //                        while (values.size < 20) {
@@ -155,7 +151,10 @@ private fun Modifier.setChartScrollable(chartConfig: ChartConfig,
     }
 )
 
-private fun Modifier.setChartDotClickable(chartConfig: ChartConfig, dotClicked: MutableState<Int>?) = this.then(
+private fun Modifier.setChartDotClickable(
+    chartConfig: ChartConfig,
+    dotClicked: MutableState<Int>?
+) = this.then(
     if (chartConfig.dotClickable) {
         val values = chartConfig.line.listValue
         pointerInput(Unit) {
@@ -164,19 +163,64 @@ private fun Modifier.setChartDotClickable(chartConfig: ChartConfig, dotClicked: 
                 onDoubleTap = { /* Called on Double Tap */ },
                 onLongPress = { /* Called on Long Press */ },
                 onTap = { offset ->
-                    val bottom = size.height - ChartConfig.verPadding
 
-                    values.forEachIndexed { index, _ ->
-                        val dotSizeX = IntRange(
-                            (ChartConfig.horPadding + index * ChartConfig.gridSize.value - 16f).toInt(),
-                            (ChartConfig.horPadding + index * ChartConfig.gridSize.value + 16f).toInt()
-                        )
-                        val dotSizeY = IntRange(
-                            (bottom - values[index] * ChartConfig.gridSize.value - 16f).toInt(),
-                            (bottom - values[index] * ChartConfig.gridSize.value + 16f).toInt()
-                        )
-                        if (offset.x.toInt() in dotSizeX && offset.y.toInt() in dotSizeY) {
-                            dotClicked!!.value = index
+                    val xEnd = size.width - ChartConfig.horPadding
+                    val yEnd = size.height - ChartConfig.verPadding
+
+                    when (chartConfig.chartLayout) {
+                        ChartConfig.LAYOUT_ALL_POS -> {
+                            values.forEachIndexed { index, _ ->
+                                val dotSizeX = IntRange(
+                                    (ChartConfig.horPadding + index * ChartConfig.gridSize.value - 16f).toInt(),
+                                    (ChartConfig.horPadding + index * ChartConfig.gridSize.value + 16f).toInt()
+                                )
+                                val dotSizeY = IntRange(
+                                    (yEnd - values[index] * ChartConfig.gridSize.value - 16f).toInt(),
+                                    (yEnd - values[index] * ChartConfig.gridSize.value + 16f).toInt()
+                                )
+                                if (offset.x.toInt() in dotSizeX && offset.y.toInt() in dotSizeY) {
+                                    dotClicked!!.value = index
+                                }
+                            }
+                        }
+                        ChartConfig.LAYOUT_ALL -> {
+                            val xLines = (yEnd / ChartConfig.gridSize.value).toInt()
+                            val yLines = (xEnd / ChartConfig.gridSize.value).toInt()
+                            //x轴的y位置
+                            val xAxisPosition = yEnd - xLines / 2 * ChartConfig.gridSize.value
+                            //y轴的x位置
+                            val yAxisPosition = ChartConfig.horPadding + yLines / 2 * ChartConfig.gridSize.value
+                            values.forEachIndexed { index, _ ->
+                                val dotSizeX = IntRange(
+                                    (yAxisPosition + index * ChartConfig.gridSize.value - 16f).toInt(),
+                                    (yAxisPosition + index * ChartConfig.gridSize.value + 16f).toInt()
+                                )
+                                val dotSizeY = IntRange(
+                                    (xAxisPosition - values[index] * ChartConfig.gridSize.value - 16f).toInt(),
+                                    (xAxisPosition - values[index] * ChartConfig.gridSize.value + 16f).toInt()
+                                )
+                                if (offset.x.toInt() in dotSizeX && offset.y.toInt() in dotSizeY) {
+                                    dotClicked!!.value = index
+                                }
+                            }
+                        }
+                        ChartConfig.LAYOUT_X_POS -> {
+                            val yLines = (xEnd / ChartConfig.gridSize.value).toInt()
+                            //y轴的x位置
+                            val yAxisPosition = ChartConfig.horPadding + yLines / 2 * ChartConfig.gridSize.value
+                            values.forEachIndexed { index, _ ->
+                                val dotSizeX = IntRange(
+                                    (yAxisPosition + index * ChartConfig.gridSize.value - 16f).toInt(),
+                                    (yAxisPosition + index * ChartConfig.gridSize.value + 16f).toInt()
+                                )
+                                val dotSizeY = IntRange(
+                                    (yEnd - values[index] * ChartConfig.gridSize.value - 16f).toInt(),
+                                    (yEnd - values[index] * ChartConfig.gridSize.value + 16f).toInt()
+                                )
+                                if (offset.x.toInt() in dotSizeX && offset.y.toInt() in dotSizeY) {
+                                    dotClicked!!.value = index
+                                }
+                            }
                         }
                     }
                 }
