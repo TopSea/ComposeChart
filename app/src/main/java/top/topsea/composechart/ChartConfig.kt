@@ -12,6 +12,7 @@ data class ChartConfig(
     var coordinate: CoordinateConfig,
     var line: LineConfig,
     var chartLayout: Int = LAYOUT_ALL_POS,
+    var chartModel: Int = MODEL_CURVE,
     var scrollable: Boolean = true,
     var scalable: Boolean = true,
     var dotClickable: Boolean = true,
@@ -36,6 +37,9 @@ data class ChartConfig(
         const val LAYOUT_X_POS = 200
         //一象限
         const val LAYOUT_ALL_POS = 300
+
+        const val MODEL_LINEAR = 600
+        const val MODEL_CURVE = 700
 
         const val horPadding = 80f
         const val verPadding = 60f
