@@ -50,6 +50,7 @@ android {
 }
 
 dependencies {
+    implementation files("D:\\Files\\Libs\\exp4j-0.4.8.jar")
 
     implementation 'androidx.core:core-ktx:1.7.0'
     implementation "androidx.compose.ui:ui:$compose_version"

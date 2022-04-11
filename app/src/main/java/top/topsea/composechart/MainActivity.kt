@@ -9,10 +9,7 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import top.topsea.compose_chart.ChartConfig
-import top.topsea.compose_chart.ComposeChart
-import top.topsea.compose_chart.CoordinateConfig
-import top.topsea.compose_chart.LineConfig
+import top.topsea.compose_chart.*
 import top.topsea.composechart.ui.theme.ComposeChartTheme
 
 class MainActivity : ComponentActivity() {
@@ -43,7 +40,7 @@ class MainActivity : ComponentActivity() {
                     ComposeChart(
                         chartConfig = chart
                     )
-
+                    chart()
 //                    LaunchedEffect(key1 = Unit) {
 //                        while (values.size < 20) {
 //                            delay(2000)
