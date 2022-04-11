@@ -1,4 +1,4 @@
-package top.topsea.composechart
+package top.topsea.compose_chart
 
 import android.graphics.PointF
 import androidx.compose.runtime.MutableState

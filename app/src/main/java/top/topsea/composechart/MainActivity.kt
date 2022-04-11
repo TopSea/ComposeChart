@@ -3,21 +3,16 @@ package top.topsea.composechart
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.gestures.*
-import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.requiredWidth
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.runtime.*
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.unit.dp
+import top.topsea.compose_chart.ChartConfig
+import top.topsea.compose_chart.ComposeChart
+import top.topsea.compose_chart.CoordinateConfig
+import top.topsea.compose_chart.LineConfig
 import top.topsea.composechart.ui.theme.ComposeChartTheme
 
 class MainActivity : ComponentActivity() {

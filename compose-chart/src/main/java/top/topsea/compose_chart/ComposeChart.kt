@@ -1,4 +1,4 @@
-package top.topsea.composechart
+package top.topsea.compose_chart
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ScrollState
