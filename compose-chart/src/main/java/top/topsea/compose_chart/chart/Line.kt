@@ -3,6 +3,9 @@ package top.topsea.compose_chart.chart
 import android.util.Range
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Paint
+import androidx.compose.ui.graphics.PaintingStyle
 import net.objecthunter.exp4j.Expression
 import net.objecthunter.exp4j.ExpressionBuilder
 import top.topsea.compose_chart.ChartConfig
@@ -11,6 +14,11 @@ class Line {
     var name: String
     private var mValueList: SnapshotStateList<Float>
     private var step: Float = 1.0f
+    var linePaint: Paint = Paint().apply {
+        color = Color.Red
+        style = PaintingStyle.Stroke
+        strokeWidth = 3f
+    }
 
     constructor(
         name: String,
@@ -35,7 +43,7 @@ class Line {
         mValueList = values
     }
 
-    fun getValueList(): SnapshotStateList<Float> {
+    fun getValueList(): List<Float> {
         return mValueList
     }
 

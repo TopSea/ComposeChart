@@ -15,6 +15,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import kotlinx.coroutines.delay
 import net.objecthunter.exp4j.Expression
 import net.objecthunter.exp4j.ExpressionBuilder
@@ -39,16 +40,30 @@ class MainActivity : ComponentActivity() {
                     val line1 = Line(
                         name = "sin(x) + 1",
                         xRange = Range(0.0, 10.0),
-                        step = 1.5f
+                        step = 0.5f
                     )
-                    val list = remember { mutableStateListOf(0f, 1f, 2f, 3f, 4f, 5f, 6f, 7f) }
+                    line1.linePaint.apply {
+                        color = Color.Blue
+                    }
+//                    val list = remember { mutableStateListOf(0f, 1f, 2f, 3f, 4f, 5f, 6f, 7f) }
                     val line2 = Line(
-                        name = "sin(x) + 1",
-                        list
+                        name = "cos(x) + 1",
+                        xRange = Range(0.0, 10.0),
+                        step = 0.5f
                     )
+                    val line3 = Line(
+                        name = "cos(x) + 5",
+                        xRange = Range(0.0, 10.0),
+                        step = 0.5f
+                    )
+                    line3.linePaint.apply {
+                        color = Color.Yellow
+                    }
+
+                    val lines = listOf<Line>(line1, line2, line3)
 
                     CanvasCoordinate()
-                    CanvasCurve(line = line1)
+                    CanvasCurve(lines = lines)
 
 
 //                    LaunchedEffect(key1 = Unit) {

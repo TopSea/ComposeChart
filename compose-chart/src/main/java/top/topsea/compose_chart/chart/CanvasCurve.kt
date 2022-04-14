@@ -69,7 +69,7 @@ fun CanvasLine(
 
 @Composable
 fun CanvasCurve(
-    line: Line
+    lines: List<Line>
 ) {
     val stop = remember { mutableStateOf(0f) }
 
@@ -81,13 +81,48 @@ fun CanvasCurve(
         modifier = Modifier.fillMaxSize(),
     ) {
         val yEnd = size.height - ChartConfig.verPadding
-        drawCurve(
-            canvas = drawContext.canvas,
-            line = line,
-            yEnd = yEnd,
-            stop = stop,
-            animate = animate
+        val xEnd = size.width - ChartConfig.horPadding
+        val canvas = drawContext.canvas
+
+        canvas.drawRect(
+            left = size.width - 300f,
+            top = 0f,
+            right = size.width,
+            bottom = 80f * lines.size,
+            paint = Paint().apply {
+                style = PaintingStyle.Fill
+                color = Color.LightGray
+            }
         )
+        canvas.drawRect(
+            left = size.width - 300f,
+            top = 0f,
+            right = size.width,
+            bottom = 80f * lines.size,
+            paint = Paint().apply {
+                strokeWidth = 2f
+                style = PaintingStyle.Stroke
+                color = Color.Black
+            }
+        )
+
+        lines.forEachIndexed { index, line ->
+            drawCurve(
+                canvas = drawContext.canvas,
+                line = line,
+                yEnd = yEnd,
+                stop = stop,
+                animate = animate
+            )
+
+            drawCurveName(
+                canvas = drawContext.canvas,
+                name = line.name,
+                xEnd = xEnd + ChartConfig.horPadding,
+                textTop = 80f * index + 40f,
+                linePaint = line.linePaint
+            )
+        }
     }
 }
 
@@ -98,7 +133,8 @@ fun drawCurve(
     stop: MutableState<Float>,
     animate: Float
 ) {
-    val srcPath = handleCurvePath(line, yEnd)
+    val listDot = line.handleValues(yEnd)
+    val srcPath = handleCurvePath(listDot)
     val dstPath = Path()
     val mPathMeasure = android.graphics.PathMeasure()
     mPathMeasure.setPath(srcPath.asAndroidPath(), false)
@@ -108,37 +144,61 @@ fun drawCurve(
         //绘制线
         canvas.drawPath(
             path = dstPath,
-            paint = Paint().apply {
-                strokeWidth = 3f
-                color = Color.Red
+            paint = line.linePaint.apply {
                 style = PaintingStyle.Stroke
+                strokeWidth = 3f
             }
         )
 
         val pos = FloatArray(2)
         mPathMeasure.getPosTan(animate, pos, null)
-        drawDot(canvas, pos, line, yEnd)
+        drawDot(canvas, pos, listDot, line.linePaint)
 
     }
+}
+
+fun drawCurveName(
+    canvas: Canvas,
+    name: String,
+    xEnd: Float,
+    textTop: Float,
+    linePaint: Paint,
+) {
+    val textPaint = NativePaint().apply {
+        color = android.graphics.Color.BLACK
+        style = android.graphics.Paint.Style.FILL
+        strokeWidth = 1f
+        textSize = 30f
+    }
+    val path = Path()
+    path.moveTo(xEnd - 280f, textTop - 20f)
+    path.lineTo(xEnd - 180f, textTop - 20f)
+    canvas.drawPath(
+        path,
+        linePaint.apply {
+            style = PaintingStyle.Stroke
+            strokeWidth = 5f
+        }
+    )
+    canvas.nativeCanvas.drawText(
+        name,
+        xEnd - 150f,
+        textTop,
+        textPaint
+    )
 }
 
 private fun drawDot(
     canvas: Canvas,
     pos: FloatArray,
-    line: Line,
-    yEnd: Float
+    listDot: List<Offset>,
+    paint: Paint
 ) {
-    val paint = Paint().apply {
-        color = Color.Red
-        style = PaintingStyle.Fill
-        strokeWidth = 3f
-    }
-    val listDot = line.handleValues(yEnd = yEnd)
     for (point in listDot) {
         if (point.x > pos[0]) {
             break
         }
-        canvas.drawCircle(Offset(point.x, point.y), 7f, paint)
+        canvas.drawCircle(Offset(point.x, point.y), 7f, paint.apply { style = PaintingStyle.Fill })
     }
 }
 
@@ -155,8 +215,7 @@ private fun handleValues(
 }
 
 private fun handleCurvePath(
-    line: Line,
-    yEnd: Float
+    listDot: List<Offset>
 ): Path {
     val srcPath = Path()
     val smooth = 0.2f
@@ -169,7 +228,6 @@ private fun handleCurvePath(
     var currentPointY = Float.NaN
     var nextPointX: Float
     var nextPointY: Float
-    val listDot = line.handleValues(yEnd)
 
     listDot.forEachIndexed { index, offset ->
         if (currentPointX.isNaN()) {
@@ -235,7 +293,6 @@ private fun handleCurvePath(
                 ctl1X, ctl1Y, ctl2X, ctl2Y,
                 currentPointX, currentPointY
             )
-
         }
 
         // 更新值,
