@@ -69,7 +69,7 @@ fun CanvasLine(
 
 @Composable
 fun CanvasCurve(
-    values: List<Float>
+    line: Line
 ) {
     val stop = remember { mutableStateOf(0f) }
 
@@ -83,7 +83,7 @@ fun CanvasCurve(
         val yEnd = size.height - ChartConfig.verPadding
         drawCurve(
             canvas = drawContext.canvas,
-            values = values,
+            line = line,
             yEnd = yEnd,
             stop = stop,
             animate = animate
@@ -93,12 +93,12 @@ fun CanvasCurve(
 
 fun drawCurve(
     canvas: Canvas,
-    values: List<Float>,
+    line: Line,
     yEnd: Float,
     stop: MutableState<Float>,
     animate: Float
 ) {
-    val srcPath = handleCurvePath(values, yEnd)
+    val srcPath = handleCurvePath(line, yEnd)
     val dstPath = Path()
     val mPathMeasure = android.graphics.PathMeasure()
     mPathMeasure.setPath(srcPath.asAndroidPath(), false)
@@ -117,7 +117,7 @@ fun drawCurve(
 
         val pos = FloatArray(2)
         mPathMeasure.getPosTan(animate, pos, null)
-        drawDot(canvas, pos, values, yEnd)
+        drawDot(canvas, pos, line, yEnd)
 
     }
 }
@@ -125,7 +125,7 @@ fun drawCurve(
 private fun drawDot(
     canvas: Canvas,
     pos: FloatArray,
-    values: List<Float>,
+    line: Line,
     yEnd: Float
 ) {
     val paint = Paint().apply {
@@ -133,7 +133,7 @@ private fun drawDot(
         style = PaintingStyle.Fill
         strokeWidth = 3f
     }
-    val listDot = handleValues(values, yEnd)
+    val listDot = line.handleValues(yEnd = yEnd)
     for (point in listDot) {
         if (point.x > pos[0]) {
             break
@@ -155,7 +155,7 @@ private fun handleValues(
 }
 
 private fun handleCurvePath(
-    values: List<Float>,
+    line: Line,
     yEnd: Float
 ): Path {
     val srcPath = Path()
@@ -169,7 +169,7 @@ private fun handleCurvePath(
     var currentPointY = Float.NaN
     var nextPointX: Float
     var nextPointY: Float
-    val listDot = handleValues(values, yEnd)
+    val listDot = line.handleValues(yEnd)
 
     listDot.forEachIndexed { index, offset ->
         if (currentPointX.isNaN()) {
