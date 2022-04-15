@@ -133,30 +133,9 @@ fun drawCurve(
     stop: MutableState<Float>,
     animate: Float
 ) {
-    val listDot = line.handleValues(yEnd, ChartConfig.gridSize.value, ChartConfig.horPadding)
-    val srcPath = handleCurvePath(listDot)
-    val dstPath = Path()
-    val mPathMeasure = android.graphics.PathMeasure()
-    mPathMeasure.setPath(srcPath.asAndroidPath(), false)
-    stop.value = mPathMeasure.length
+    line.handleValues(yEnd, ChartConfig.gridSize.value, ChartConfig.gridSize.value, ChartConfig.horPadding)
 
-    if (mPathMeasure.getSegment(0f, animate, dstPath.asAndroidPath(), true)) {
-        //绘制线
-        canvas.drawPath(
-            path = dstPath,
-            paint = line.linePaint.apply {
-                style = PaintingStyle.Stroke
-                strokeWidth = 3f
-            }
-        )
-
-        if (line.showDot) {
-            val pos = FloatArray(2)
-            mPathMeasure.getPosTan(animate, pos, null)
-            drawDot(canvas, pos, listDot, line.linePaint)
-        }
-
-    }
+    line.drawCurve(canvas, stop, animate)
 }
 
 fun drawCurveName(

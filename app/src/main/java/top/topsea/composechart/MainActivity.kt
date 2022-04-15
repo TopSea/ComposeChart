@@ -1,17 +1,16 @@
 package top.topsea.composechart
 
-import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.util.Range
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
@@ -127,34 +126,42 @@ fun TestChart() {
 fun Test(
     modifier: Modifier
 ) {
+    val stop = remember { mutableStateOf(0f) }
+
+    val animate by animateFloatAsState(
+        targetValue = stop.value,
+        animationSpec = tween(durationMillis = 3000, easing = FastOutSlowInEasing)
+    )
+
+
+    val line1 = Line(
+        name = "sin(x) + 1",
+        xRange = Range(0.0, 10.0),
+        step = 0.5f
+    )
+    line1.linePaint.apply {
+        color = Color.Blue
+    }
+    line1.showDot = false
+    line1.animate = animate
+
+    val line2 = Line(
+        name = "cos(x) + 1",
+        xRange = Range(0.0, 5.0),
+        step = 0.5f
+    )
+    val line3 = Line(
+        name = "cos(x) + 5",
+        xRange = Range(0.0, 10.0),
+        step = 0.5f
+    )
+    line3.linePaint.apply {
+        color = Color.Yellow
+    }
+    val lines = listOf<Line>(line1, line2, line3)
     Canvas(
         modifier = modifier
     ) {
-        val line1 = Line(
-            name = "sin(x) + 1",
-            xRange = Range(0.0, 10.0),
-            step = 0.5f
-        )
-        line1.linePaint.apply {
-            color = Color.Blue
-        }
-        line1.showDot = false
-
-        val line2 = Line(
-            name = "cos(x) + 1",
-            xRange = Range(0.0, 10.0),
-            step = 0.5f
-        )
-        val line3 = Line(
-            name = "cos(x) + 5",
-            xRange = Range(0.0, 10.0),
-            step = 0.5f
-        )
-        line3.linePaint.apply {
-            color = Color.Yellow
-        }
-
-        val lines = listOf<Line>(line1, line2, line3)
 
         val chart = LineChart(
             canvas = drawContext.canvas,
@@ -165,6 +172,16 @@ fun Test(
 
         chart.axisUnit = arrayOf("千元", "吨")
         chart.model = CoordinateChart.MODEL_ALL_POS
-        chart.drawChart()
+        chart.drawChart(
+            stop = stop,
+            animate = animate
+        )
+    }
+    LaunchedEffect(key1 = Unit) {
+        delay(2000)
+        while (line2.getValueList().size < 20) {
+            delay(200)
+            line2.getValueList().add(Random.nextFloat() * 18)
+        }
     }
 }

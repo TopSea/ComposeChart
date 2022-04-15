@@ -31,11 +31,11 @@ open class CoordinateChart(
 
     init {
         model = if (xRange.lower >= 0 && yRange.lower >= 0) {
-            Coordinate.MODEL_ALL_POS
+            MODEL_ALL_POS
         } else if (xRange.lower < 0 && yRange.lower >= 0) {
-            Coordinate.MODEL_X_POS
+            MODEL_X_POS
         } else {
-            Coordinate.MODEL_ALL
+            MODEL_ALL
         }
     }
 
