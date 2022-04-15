@@ -16,6 +16,9 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.NativePaint
+import androidx.compose.ui.graphics.Paint
+import androidx.compose.ui.graphics.PaintingStyle
 import kotlinx.coroutines.delay
 import net.objecthunter.exp4j.Expression
 import net.objecthunter.exp4j.ExpressionBuilder
@@ -37,33 +40,34 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    val line1 = Line(
-                        name = "sin(x) + 1",
-                        xRange = Range(0.0, 10.0),
-                        step = 0.5f
-                    )
-                    line1.linePaint.apply {
-                        color = Color.Blue
-                    }
+//                    val line1 = Line(
+//                        name = "sin(x) + 1",
+//                        xRange = Range(0.0, 10.0),
+//                        step = 0.5f
+//                    )
+//                    line1.linePaint.apply {
+//                        color = Color.Blue
+//                    }
+//                    line1.showDot = false
 //                    val list = remember { mutableStateListOf(0f, 1f, 2f, 3f, 4f, 5f, 6f, 7f) }
-                    val line2 = Line(
-                        name = "cos(x) + 1",
-                        xRange = Range(0.0, 10.0),
-                        step = 0.5f
-                    )
-                    val line3 = Line(
-                        name = "cos(x) + 5",
-                        xRange = Range(0.0, 10.0),
-                        step = 0.5f
-                    )
-                    line3.linePaint.apply {
-                        color = Color.Yellow
-                    }
-
-                    val lines = listOf<Line>(line1, line2, line3)
-
-                    CanvasCoordinate()
-                    CanvasCurve(lines = lines)
+//                    val line2 = Line(
+//                        name = "cos(x) + 1",
+//                        xRange = Range(0.0, 10.0),
+//                        step = 0.5f
+//                    )
+//                    val line3 = Line(
+//                        name = "cos(x) + 5",
+//                        xRange = Range(0.0, 10.0),
+//                        step = 0.5f
+//                    )
+//                    line3.linePaint.apply {
+//                        color = Color.Yellow
+//                    }
+//
+//                    val lines = listOf<Line>(line1, line2, line3)
+//
+//                    CanvasCoordinate()
+//                    CanvasCurve(lines = lines)
 
 
 //                    LaunchedEffect(key1 = Unit) {
@@ -76,6 +80,8 @@ class MainActivity : ComponentActivity() {
 //                    }
 
 //                    TestChart()
+                    
+                    Test(modifier = Modifier.fillMaxSize())
                 }
             }
         }
@@ -107,7 +113,7 @@ fun TestChart() {
     ComposeChart(
         chartConfig = chart
     )
-    chart()
+
     LaunchedEffect(key1 = Unit) {
         while (values.size < 20) {
             delay(2000)
@@ -124,6 +130,41 @@ fun Test(
     Canvas(
         modifier = modifier
     ) {
+        val line1 = Line(
+            name = "sin(x) + 1",
+            xRange = Range(0.0, 10.0),
+            step = 0.5f
+        )
+        line1.linePaint.apply {
+            color = Color.Blue
+        }
+        line1.showDot = false
 
+        val line2 = Line(
+            name = "cos(x) + 1",
+            xRange = Range(0.0, 10.0),
+            step = 0.5f
+        )
+        val line3 = Line(
+            name = "cos(x) + 5",
+            xRange = Range(0.0, 10.0),
+            step = 0.5f
+        )
+        line3.linePaint.apply {
+            color = Color.Yellow
+        }
+
+        val lines = listOf<Line>(line1, line2, line3)
+
+        val chart = LineChart(
+            canvas = drawContext.canvas,
+            lines = lines,
+            height = size.height,
+            width = size.width
+        )
+
+        chart.axisUnit = arrayOf("千元", "吨")
+        chart.model = CoordinateChart.MODEL_ALL_POS
+        chart.drawChart()
     }
 }

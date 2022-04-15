@@ -3,9 +3,7 @@ package top.topsea.compose_chart.chart
 import android.util.Range
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Paint
-import androidx.compose.ui.graphics.PaintingStyle
+import androidx.compose.ui.graphics.*
 import net.objecthunter.exp4j.Expression
 import net.objecthunter.exp4j.ExpressionBuilder
 import top.topsea.compose_chart.ChartConfig
@@ -14,6 +12,9 @@ class Line {
     var name: String
     private var mValueList: SnapshotStateList<Float>
     private var step: Float = 1.0f
+    var showDot: Boolean = true
+    var showValue: Boolean = false
+    var showInfo: Boolean = true
     var linePaint: Paint = Paint().apply {
         color = Color.Red
         style = PaintingStyle.Stroke
@@ -43,18 +44,61 @@ class Line {
         mValueList = values
     }
 
-    fun getValueList(): List<Float> {
-        return mValueList
-    }
-
     fun handleValues(
-        yEnd: Float
+        gridSize: Float,
+        yEnd: Float,
+        padding: Float
     ): List<Offset> {
         return List(mValueList.size){ index ->
             Offset(
-                index * ChartConfig.gridSize.value * step + ChartConfig.horPadding,
-                yEnd - mValueList[index] * ChartConfig.gridSize.value
+                index * gridSize * step + padding,
+                yEnd - mValueList[index] * gridSize
             )
+        }
+    }
+
+
+    private fun drawCurveName(
+        canvas: Canvas,
+        xEnd: Float,
+        textTop: Float,
+        linePaint: Paint,
+    ) {
+        val textPaint = NativePaint().apply {
+            color = android.graphics.Color.BLACK
+            style = android.graphics.Paint.Style.FILL
+            strokeWidth = 1f
+            textSize = 30f
+        }
+        val path = Path()
+        path.moveTo(xEnd - 340f, textTop)
+        path.lineTo(xEnd - 240f, textTop)
+        canvas.drawPath(
+            path,
+            linePaint.apply {
+                style = PaintingStyle.Stroke
+                strokeWidth = 5f
+            }
+        )
+        canvas.nativeCanvas.drawText(
+            name,
+            xEnd - 210f,
+            textTop,
+            textPaint
+        )
+    }
+
+    private fun drawDot(
+        canvas: Canvas,
+        pos: FloatArray,
+        listDot: List<Offset>,
+        paint: Paint
+    ) {
+        for (point in listDot) {
+            if (point.x > pos[0]) {
+                break
+            }
+            canvas.drawCircle(Offset(point.x, point.y), 7f, paint.apply { style = PaintingStyle.Fill })
         }
     }
 }

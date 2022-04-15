@@ -85,7 +85,7 @@ fun CanvasCurve(
         val canvas = drawContext.canvas
 
         canvas.drawRect(
-            left = size.width - 300f,
+            left = size.width - 360f,
             top = 0f,
             right = size.width,
             bottom = 80f * lines.size,
@@ -95,7 +95,7 @@ fun CanvasCurve(
             }
         )
         canvas.drawRect(
-            left = size.width - 300f,
+            left = size.width - 360f,
             top = 0f,
             right = size.width,
             bottom = 80f * lines.size,
@@ -133,7 +133,7 @@ fun drawCurve(
     stop: MutableState<Float>,
     animate: Float
 ) {
-    val listDot = line.handleValues(yEnd)
+    val listDot = line.handleValues(yEnd, ChartConfig.gridSize.value, ChartConfig.horPadding)
     val srcPath = handleCurvePath(listDot)
     val dstPath = Path()
     val mPathMeasure = android.graphics.PathMeasure()
@@ -150,9 +150,11 @@ fun drawCurve(
             }
         )
 
-        val pos = FloatArray(2)
-        mPathMeasure.getPosTan(animate, pos, null)
-        drawDot(canvas, pos, listDot, line.linePaint)
+        if (line.showDot) {
+            val pos = FloatArray(2)
+            mPathMeasure.getPosTan(animate, pos, null)
+            drawDot(canvas, pos, listDot, line.linePaint)
+        }
 
     }
 }
@@ -171,8 +173,8 @@ fun drawCurveName(
         textSize = 30f
     }
     val path = Path()
-    path.moveTo(xEnd - 280f, textTop - 20f)
-    path.lineTo(xEnd - 180f, textTop - 20f)
+    path.moveTo(xEnd - 340f, textTop)
+    path.lineTo(xEnd - 240f, textTop)
     canvas.drawPath(
         path,
         linePaint.apply {
@@ -182,7 +184,7 @@ fun drawCurveName(
     )
     canvas.nativeCanvas.drawText(
         name,
-        xEnd - 150f,
+        xEnd - 210f,
         textTop,
         textPaint
     )
@@ -202,7 +204,7 @@ private fun drawDot(
     }
 }
 
-private fun handleValues(
+private fun handleData(
     values: List<Float>,
     yEnd: Float
 ): List<Offset> {
