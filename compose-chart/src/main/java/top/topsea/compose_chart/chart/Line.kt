@@ -19,7 +19,7 @@ class Line {
 
     var showDot: Boolean = true
     var showValue: Boolean = false
-    var showInfo: Boolean = true
+    var showDotInfo: Boolean = true
 
     var animate: Float = 0f
 
@@ -29,6 +29,7 @@ class Line {
         strokeWidth = 3f
     }
 
+    //表达式不能动态添加
     constructor(
         name: String,
         xRange: Range<Double> = Range(-10.0, 10.0),
@@ -47,6 +48,8 @@ class Line {
             i += step
         }
     }
+
+    //值列表可以动态添加
     constructor(name: String, values: SnapshotStateList<Float>) {
         this.name = name
         mValueList = values
@@ -183,36 +186,6 @@ class Line {
             currentPointX = nextPointX
             currentPointY = nextPointY
         }
-    }
-
-    private fun drawCurveName(
-        canvas: Canvas,
-        xEnd: Float,
-        textTop: Float,
-        linePaint: Paint,
-    ) {
-        val textPaint = NativePaint().apply {
-            color = android.graphics.Color.BLACK
-            style = android.graphics.Paint.Style.FILL
-            strokeWidth = 1f
-            textSize = 30f
-        }
-        val path = Path()
-        path.moveTo(xEnd - 340f, textTop)
-        path.lineTo(xEnd - 240f, textTop)
-        canvas.drawPath(
-            path,
-            linePaint.apply {
-                style = PaintingStyle.Stroke
-                strokeWidth = 5f
-            }
-        )
-        canvas.nativeCanvas.drawText(
-            name,
-            xEnd - 210f,
-            textTop,
-            textPaint
-        )
     }
 
     private fun drawDot(
