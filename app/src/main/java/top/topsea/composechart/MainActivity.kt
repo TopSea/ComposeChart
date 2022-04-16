@@ -72,12 +72,13 @@ fun Chart1() {
         name = "line2",
         values = list
     )
+    line2.showValue = true
     val lines = listOf<Line>( line2,)
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(300.dp)
+            .height(500.dp)
             .padding(vertical = 16.dp, horizontal = 8.dp)
     ) {
         Column {
@@ -109,12 +110,6 @@ fun Chart1() {
 
 @Composable
 fun Chart2() {
-//    val line1 = Line(
-//        name = "sin(x) + 2",
-//        xRange = Range(0.0, 8.0),
-//        step = 0.5f
-//    )
-//    line1.linePaint.color = Color.Green
     val line3 = Line(
         name = "cos(x) + 5",
         xRange = Range(0.0, 8.0),
@@ -142,12 +137,9 @@ fun Chart3() {
         step = 0.5f
     )
     line1.linePaint.color = Color.Green
-    val line3 = Line(
-        name = "cos(x) + 5",
-        xRange = Range(0.0, 8.0),
-        step = 0.5f
-    )
-    line3.linePaint.color = Color.Green
+
+    val chart = LineChart(listOf(line1))
+    chart.width = 2000f
 
     Card(
         modifier = Modifier
@@ -155,7 +147,7 @@ fun Chart3() {
             .height(300.dp)
             .padding(vertical = 16.dp, horizontal = 8.dp)
     ) {
-        MultiLineChart(chart = LineChart(listOf(line1, line3)))
+        MultiLineChart(chart = chart)
     }
 }
 

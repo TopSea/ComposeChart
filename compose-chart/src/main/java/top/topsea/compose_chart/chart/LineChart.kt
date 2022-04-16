@@ -18,6 +18,7 @@ class LineChart(
     var gridSize = mutableStateOf(100f)
     var withCoordinate: Boolean = true
     var withChartInfo: Boolean = true
+    var scrollable: Boolean = true
 
     var height: Float = 0f
     var width: Float = 0f

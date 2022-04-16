@@ -5,6 +5,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.animateOffsetAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -69,6 +70,7 @@ fun CanvasLine(
 
 @Composable
 fun CanvasCurve(
+    modifier: Modifier,
     line: Line,
     xStepSize: Float,
     yStepSize: Float
@@ -80,7 +82,7 @@ fun CanvasCurve(
         animationSpec = tween(durationMillis = 3000, easing = FastOutSlowInEasing)
     )
     Canvas(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxHeight(),
     ) {
         val yEnd = size.height - CoordinateChart.padding
         val canvas = drawContext.canvas

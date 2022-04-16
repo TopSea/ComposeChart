@@ -1,7 +1,10 @@
 package top.topsea.compose_chart.chart
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -9,15 +12,19 @@ import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.drawscope.rotateRad
+import androidx.compose.ui.unit.dp
 import top.topsea.compose_chart.ChartConfig
 
 @Composable
 fun CanvasCoordinate(
+    modifier: Modifier,
     chart: LineChart
 ) {
     Canvas(
-        modifier = Modifier.fillMaxSize()
+        modifier = modifier
+            .fillMaxHeight()
     ) {
+        println("gaohai:::size.height${size.height} size.width${size.width}")
         val canvas = drawContext.canvas
         val xEnd = size.width - CoordinateChart.padding
         if (chart.withChartInfo) {
@@ -43,7 +50,6 @@ fun CanvasCoordinate(
                 }
             )
 
-
             chart.lines.forEachIndexed{ index, line ->
                 chart.drawChartInfo(
                     canvas = canvas,
@@ -54,6 +60,7 @@ fun CanvasCoordinate(
                 )
             }
         }
+        println("gaohai:::size.height${size.height} size.width${size.width}")
         chart.drawCoordinate(
             canvas = canvas,
             axisPaint = Paint().apply {

@@ -73,6 +73,9 @@ class Line {
                 dstPath.asAndroidPath(),
                 true)
         ) {
+            val pos = FloatArray(2)
+            mPathMeasure.getPosTan(animate, pos, null)
+
             //绘制线
             canvas.drawPath(
                 path = dstPath,
@@ -81,11 +84,12 @@ class Line {
                     strokeWidth = 3f
                 }
             )
-
             if (showDot) {
-                val pos = FloatArray(2)
-                mPathMeasure.getPosTan(animate, pos, null)
                 drawDot(canvas, pos, linePaint)
+            }
+
+            if(showValue) {
+                drawDotValue(canvas, pos)
             }
         }
     }
@@ -201,6 +205,24 @@ class Line {
                 break
             }
             canvas.drawCircle(Offset(point.x, point.y), 7f, paint.apply { style = PaintingStyle.Fill })
+        }
+    }
+
+    private fun drawDotValue(
+        canvas: Canvas,
+        pos: FloatArray
+    ) {
+        mListDot.forEachIndexed { index, offset ->
+            if (offset.x <= pos[0]) {
+                canvas.nativeCanvas.drawText(
+                    mValueList[index].toString(),
+                    offset.x,
+                    offset.y,
+                    NativePaint().apply {
+                        textSize = 30f
+                    }
+                )
+            }
         }
     }
 }
