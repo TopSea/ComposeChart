@@ -95,17 +95,34 @@ class Line {
     }
 
     fun handleValues(
+        model: Int,
         xStepSize: Float,
         yStepSize: Float,
         yEnd: Float,
         padding: Float
     ) {
-        mListDot = List(mValueList.size){ index ->
-            Offset(
-                index * xStepSize * step + padding,
-                yEnd - mValueList[index] * yStepSize
-            )
+        mListDot = when (model) {
+            CoordinateChart.MODEL_ALL -> {
+                List(mValueList.size) { index ->
+                    Offset(
+                        index * xStepSize * step + padding,
+                        yEnd - mValueList[index] * yStepSize
+                    )
+                }
+            }
+
+            else -> {
+                List(mValueList.size) { index ->
+                    Offset(
+                        index * xStepSize * step + padding,
+                        yEnd - mValueList[index] * yStepSize
+                    )
+                }
+            }
         }
+
+
+
         mPath = Path()
         val smooth = 0.2f
 

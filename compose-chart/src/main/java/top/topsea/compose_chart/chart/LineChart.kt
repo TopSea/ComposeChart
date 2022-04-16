@@ -78,6 +78,7 @@ override fun drawChart(
 
         lines.forEachIndexed { index, line ->
             line.handleValues(
+                model = model,
                 xStepSize = xStepSize,
                 yStepSize = yStepSize,
                 yEnd = yEnd,

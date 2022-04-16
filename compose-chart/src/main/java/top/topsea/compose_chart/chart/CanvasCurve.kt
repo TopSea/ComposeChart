@@ -72,6 +72,7 @@ fun CanvasLine(
 fun CanvasCurve(
     modifier: Modifier,
     line: Line,
+    model: Int,
     xStepSize: Float,
     yStepSize: Float
 ) {
@@ -88,6 +89,7 @@ fun CanvasCurve(
         val canvas = drawContext.canvas
 
         line.handleValues(
+            model = model,
             xStepSize = xStepSize,
             yStepSize = yStepSize,
             yEnd = yEnd,

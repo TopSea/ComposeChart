@@ -46,6 +46,7 @@ fun MultiLineChart(
             CanvasCurve(
                 modifier = Modifier.requiredWidth(widthDp),
                 line = line,
+                model = chart.model,
                 xStepSize = chart.xStepSize,
                 yStepSize = chart.yStepSize
             )
