@@ -21,12 +21,13 @@ open class CoordinateChart(
     var xStepSize = 100f
     var yStepSize = 100f
 
-    val padding = 80f
     var model = MODEL_ALL
     companion object {
-        val MODEL_ALL_POS = 1000
-        val MODEL_X_POS = 1200
-        val MODEL_ALL = 1300
+        const val MODEL_ALL_POS = 1000
+        const val MODEL_X_POS = 1200
+        const val MODEL_ALL = 1300
+
+        const val padding = 80f
     }
 
     init {

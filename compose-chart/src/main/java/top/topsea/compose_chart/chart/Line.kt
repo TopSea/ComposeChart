@@ -21,8 +21,6 @@ class Line {
     var showValue: Boolean = false
     var showDotInfo: Boolean = true
 
-    var animate: Float = 0f
-
     var linePaint: Paint = Paint().apply {
         color = Color.Red
         style = PaintingStyle.Stroke
@@ -53,10 +51,6 @@ class Line {
     constructor(name: String, values: SnapshotStateList<Float>) {
         this.name = name
         mValueList = values
-    }
-
-    fun getValueList(): SnapshotStateList<Float> {
-        return mValueList
     }
 
     fun drawCurve(
