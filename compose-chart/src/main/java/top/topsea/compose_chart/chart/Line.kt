@@ -21,6 +21,8 @@ class Line {
     var showValue: Boolean = false
     var showDotInfo: Boolean = true
 
+    var withAnimate: Boolean = true
+
     var linePaint: Paint = Paint().apply {
         color = Color.Red
         style = PaintingStyle.Stroke
@@ -61,9 +63,16 @@ class Line {
         val dstPath = Path()
         val mPathMeasure = android.graphics.PathMeasure()
         mPathMeasure.setPath(mPath.asAndroidPath(), false)
-        stop.value = mPathMeasure.length
+        if (withAnimate) {
+            stop.value = mPathMeasure.length
+        }
 
-        if (mPathMeasure.getSegment(0f, animate, dstPath.asAndroidPath(), true)) {
+        if (mPathMeasure.getSegment(
+                0f,
+                if (withAnimate) { animate } else { mPathMeasure.length },
+                dstPath.asAndroidPath(),
+                true)
+        ) {
             //绘制线
             canvas.drawPath(
                 path = dstPath,
@@ -78,7 +87,6 @@ class Line {
                 mPathMeasure.getPosTan(animate, pos, null)
                 drawDot(canvas, pos, linePaint)
             }
-
         }
     }
 

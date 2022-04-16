@@ -71,7 +71,7 @@ fun CanvasLine(
 fun CanvasCurve(
     line: Line,
     xStepSize: Float,
-    yStepSize: Float,
+    yStepSize: Float
 ) {
     val stop = remember { mutableStateOf(0f) }
 
@@ -93,5 +93,6 @@ fun CanvasCurve(
         )
 
         line.drawCurve(canvas, stop, animate)
+
     }
 }

@@ -7,10 +7,7 @@ import androidx.compose.ui.graphics.*
 import top.topsea.compose_chart.ChartConfig
 
 class LineChart(
-    val canvas: Canvas,
     val lines: List<Line>,
-    val height: Float,
-    val width: Float,
 ) : CoordinateChart() {
     override var withGrid: Boolean = true
     override var withArrow: Boolean = true
@@ -22,21 +19,17 @@ class LineChart(
     var withCoordinate: Boolean = true
     var withChartInfo: Boolean = true
 
-//    constructor(
-//        lines: List<Line>,
-//        canvas: Canvas,
-//        height: Float,
-//        width: Float
-//    ) : this(
-//        lines = lines,
-//        canvas = canvas,
-//        height = height,
-//        width = width,
-//    )
+    var height: Float = 0f
+    var width: Float = 0f
+
+    constructor(line: Line, ) : this(lines = listOf(line),)
+
+
 override fun drawChart(
 ) {}
 
     fun drawChart(
+        canvas: Canvas,
         stop: MutableState<Float>,
         animate: Float
     ) {
@@ -90,13 +83,15 @@ override fun drawChart(
                 padding = padding
             )
 
-           line.drawCurve(
+
+            line.drawCurve(
                canvas = canvas,
                stop, animate
-           )
+            )
 
             if (withChartInfo) {
                 drawChartInfo(
+                    canvas = canvas,
                     name = line.name,
                     xEnd = xEnd + ChartConfig.horPadding,
                     textTop = 80f * index + 40f,
@@ -106,7 +101,8 @@ override fun drawChart(
         }
     }
 
-    private fun drawChartInfo(
+    fun drawChartInfo(
+        canvas: Canvas,
         name: String,
         xEnd: Float,
         textTop: Float,

@@ -47,7 +47,9 @@ class MainActivity : ComponentActivity() {
 //                    TestChart()
 
                     LazyColumn(
-                        modifier = Modifier.fillMaxSize().background(Color.LightGray)
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color.LightGray)
                     ) {
                         item {
                             Chart1()
@@ -134,18 +136,18 @@ fun Chart2() {
 
 @Composable
 fun Chart3() {
-//    val line1 = Line(
-//        name = "sin(x) + 2",
-//        xRange = Range(0.0, 8.0),
-//        step = 0.5f
-//    )
-//    line1.linePaint.color = Color.Green
+    val line1 = Line(
+        name = "sin(x) + 2",
+        xRange = Range(0.0, 8.0),
+        step = 0.5f
+    )
+    line1.linePaint.color = Color.Green
     val line3 = Line(
         name = "cos(x) + 5",
         xRange = Range(0.0, 8.0),
         step = 0.5f
     )
-    line3.linePaint.color = Color.Blue
+    line3.linePaint.color = Color.Green
 
     Card(
         modifier = Modifier
@@ -153,7 +155,7 @@ fun Chart3() {
             .height(300.dp)
             .padding(vertical = 16.dp, horizontal = 8.dp)
     ) {
-        CanvasCurve(line = line3, xStepSize = 100f, yStepSize = 100f)
+        MultiLineChart(chart = LineChart(listOf(line1, line3)))
     }
 }
 
@@ -210,15 +212,15 @@ fun Test(
         ) {
 
             val chart = LineChart(
-                canvas = drawContext.canvas,
                 lines = lines,
-                height = size.height,
-                width = size.width
             )
 
+            chart.height = if (chart.height > 0) chart.height else size.height
+            chart.width = if (chart.width > 0) chart.width else size.width
 //        chart.axisUnit = arrayOf("千元", "吨")
             chart.model = CoordinateChart.MODEL_ALL_POS
             chart.drawChart(
+                canvas = drawContext.canvas,
                 stop = stop,
                 animate = animate
             )
